@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -15,6 +16,7 @@ type (
 	}
 
 	Config struct {
+		ComposerAddrs []string `arg:"required,-,--,env:COMPOSER_ADDRS"`
 	}
 )
 
@@ -26,6 +28,9 @@ func New(cfg Config) (*Service, error) {
 		}
 		err error
 	)
+
+	fmt.Printf("%+v\n", cfg)
+
 	return s, err
 }
 

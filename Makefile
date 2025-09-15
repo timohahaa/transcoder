@@ -1,4 +1,5 @@
-BUILD_ENVPARMS:=GOOS=linux GOARCH=amd64 CGO_ENABLED=0
+#BUILD_ENVPARMS:=GOOS=linux GOARCH=amd64 CGO_ENABLED=0
+BUILD_ENVPARMS:=GOOS=darwin GOARCH=arm64 CGO_ENABLED=0
 LDFLAGS:=-s -w
 
 build-composer:
@@ -27,8 +28,13 @@ proto:
 
 run-composer:
 	@DEBUG=true \
+	REDIS_ADDRS=localhost:6767 \
+	REDIS_USERNAME=redis-user \
+	REDIS_PASSWORD=redis-pass \
+	POSTGRES_DSN=postgres://postgres:password@localhost:5432/main?sslmode=disable \
 	go run cmd/composer/main.go
 
 run-worker:
 	@DEBUG=true \
+	COMPOSER_ADDRS=localhost:9999 \
 	go run cmd/worker/main.go
