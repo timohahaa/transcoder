@@ -11,28 +11,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type (
-	Service struct {
-		cfg    Config
-		signal chan os.Signal
+type Service struct {
+	cfg    Config
+	signal chan os.Signal
 
-		redis redis.UniversalClient
-		conn  *pgxpool.Pool
-	}
-)
-type (
-	Config struct {
-		PostgresDSN string `arg:"required,-,--,env:POSTGRES_DSN"`
-		Redis
-	}
-	Redis struct {
-		Addrs    []string `arg:"required,-,--,env:REDIS_ADDRS"`
-		Username string   `arg:"required,-,--,env:REDIS_USERNAME"`
-		Password string   `arg:"required,-,--,env:REDIS_PASSWORD"`
-	}
-)
+	redis redis.UniversalClient
+	conn  *pgxpool.Pool
+}
 
 func New(cfg Config) (*Service, error) {
+	cfg.setDefaults()
+
 	var (
 		s = &Service{
 			cfg:    cfg,

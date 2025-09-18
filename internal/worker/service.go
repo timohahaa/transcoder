@@ -9,18 +9,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type (
-	Service struct {
-		cfg    Config
-		signal chan os.Signal
-	}
-
-	Config struct {
-		ComposerAddrs []string `arg:"required,-,--,env:COMPOSER_ADDRS"`
-	}
-)
+type Service struct {
+	cfg    Config
+	signal chan os.Signal
+}
 
 func New(cfg Config) (*Service, error) {
+	cfg.setDefaults()
+
 	var (
 		s = &Service{
 			cfg:    cfg,

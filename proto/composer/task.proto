@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/timohahaa/transcoder/proto/composer";
+
+package composer;
+
+message Task {
+  bytes                     ID         = 1; // taskID видео-таски
+  int32                     Part       = 2; // номер чанка, чтоб не потерять последовательность
+  int32                     PartsTotal = 3; // всего чанков в глобальной видео-таске
+  Video                     Video      = 4;
+  Audio                     Audio      = 5;
+  string                    Source     = 6; // url
+  string                    PushTo     = 7; // url
+  google.protobuf.Timestamp CreatedAt  = 8;
+  map<string,bool>          Features   = 9;
+}
+
+message Audio {
+  string Codec    = 1; 
+  int64  BitRate  = 2;
+  float  Duration = 3;
+  int32  TrackNum = 4;
+}
+
+message Video  {
+           string Codec        = 1;
+           int64  BitRate      = 2;
+           float  Duration     = 3;
+           string Quality      = 4;
+           string PixFmt       = 5;
+           bool   CreatePoster = 6;
+  repeated Preset Presets      = 7;
+}
+
+message Preset {
+    string Quality        = 1; // 360, 720, 1440, etc...
+    int64  MaxBitRate     = 2;
+    int64  MinBitRate     = 3;
+    string FPS            = 4;
+    string Codec          = 5;
+    int64  Bufsize        = 6;
+    int32  GOPSeconds     = 7;
+    string Profile        = 8;
+    string Level          = 9;
+    int32  CRF            = 10; // -cq для GPU и -crf для CPU
+    string ColorTrc       = 11;
+    string ColorSpace     = 12;
+    string ColorPrimaries = 13;
+    string Tune           = 14; // psnr/ssim/grain/zerolatency/animation/film - содержание видео
+    string Transpose      = 15; // clock/cclock/flip
+    bool   IsVertical     = 16;
+    int32  Width          = 17;
+    int32  Height         = 18;
+}
+
