@@ -25,16 +25,29 @@ proto:
     --go-grpc_out=. --go-grpc_opt=paths=source_relative \
     proto/composer/*.proto
 
-
 run-composer:
 	@DEBUG=true \
 	REDIS_ADDRS=localhost:6767 \
 	REDIS_USERNAME=redis-user \
 	REDIS_PASSWORD=redis-pass \
-	POSTGRES_DSN=postgres://postgres:password@localhost:5432/main?sslmode=disable \
+	POSTGRES_DSN=postgres://postgres:password@0.0.0.0:5432/main?sslmode=disable \
 	go run cmd/composer/main.go
 
 run-worker:
 	@DEBUG=true \
 	COMPOSER_ADDRS=localhost:9999 \
 	go run cmd/worker/main.go
+
+
+compose-up:
+	@echo "Stop current dev environment..."
+	docker compose down
+	@echo "Setup dev environment..."
+	docker compose up --build
+
+compose-down:
+	docker compose down
+
+compose-shutdown:
+	docker compose down --volumes
+

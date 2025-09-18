@@ -1,0 +1,32 @@
+services:
+  postgres:
+    platform: linux/x86_64
+    container_name: postgres
+    restart: unless-stopped
+    image: postgres:17.6-alpine
+    env_file: .env
+    ports:
+      - ${PGPORT}:${PGPORT}
+    expose:
+      - ${PGPORT}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+      interval: 5s
+      timeout: 5s
+      retries: 3
+
+  migrations:
+    container_name: migrations
+    restart: "no"
+    build:
+      context: .
+      dockerfile: ./sql-migrate.Dockerfile
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pg_data:
