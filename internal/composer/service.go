@@ -4,11 +4,13 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 	log "github.com/sirupsen/logrus"
+	"github.com/timohahaa/transcoder/internal/composer/splitter"
 )
 
 type Service struct {
@@ -59,9 +61,29 @@ func (srv *Service) Run() error {
 		}
 	)
 
+	splitter := splitter.New(
+		srv.conn,
+		srv.redis,
+		srv.cfg.HttpAddr,
+	)
+	splitter.Run(srv.cfg.Splitter.Workers, srv.cfg.Splitter.Watchers)
+
 	signal.Notify(srv.signal, signals...)
 	signal := <-srv.signal
 	log.Infof("got signal: %s", signal)
+
+	{
+		wg := sync.WaitGroup{}
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			splitter.Shutdown()
+		}()
+		wg.Wait()
+	}
+
+	srv.conn.Close()
+	_ = srv.redis.Close()
 
 	return nil
 }

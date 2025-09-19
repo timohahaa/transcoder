@@ -4,6 +4,7 @@ go 1.25.1
 
 require (
 	github.com/alexflint/go-arg v1.6.0
+	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.7.6
 	github.com/redis/go-redis/v9 v9.14.0
 	github.com/sirupsen/logrus v1.9.3
