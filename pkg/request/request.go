@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/timohahaa/transcoder/pkg/errors"
 )
 
 var (
@@ -33,26 +35,26 @@ func Upload(ctx context.Context, url, path string, maxRetries uint) (resp *http.
 
 	f, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return nil, errors.Generic(err)
 	}
 	defer f.Close()
 
 	i, err := f.Stat()
 	if err != nil {
-		return nil, err
+		return nil, errors.Generic(err)
 	}
 
 	for n := range maxRetries {
 		if n > 0 {
 			time.Sleep(time.Duration(n+1) * (1_00 * time.Millisecond))
 			if _, err := f.Seek(0, io.SeekStart); err != nil {
-				return nil, err
+				return nil, errors.Generic(err)
 			}
 		}
 
 		r, err := http.NewRequestWithContext(ctx, http.MethodPost, url, f)
 		if err != nil {
-			return nil, err
+			return nil, errors.Generic(err)
 		}
 
 		r.ContentLength = i.Size()
@@ -70,7 +72,7 @@ func Upload(ctx context.Context, url, path string, maxRetries uint) (resp *http.
 func Download(ctx context.Context, src, dst string, maxRetries uint) (retErr error) {
 	f, err := os.Create(dst)
 	if err != nil {
-		return err
+		return errors.Generic(err)
 	}
 	defer func() {
 		f.Sync()
@@ -82,31 +84,31 @@ func Download(ctx context.Context, src, dst string, maxRetries uint) (retErr err
 
 	r, err := http.NewRequestWithContext(ctx, http.MethodGet, src, nil)
 	if err != nil {
-		return err
+		return errors.Generic(err)
 	}
 
 	download := func() error {
 		resp, err := getClient.Do(r)
 		if err != nil {
-			return err
+			return errors.Network(err)
 		}
 		defer resp.Body.Close()
 
 		if resp.StatusCode != http.StatusOK {
-			return fmt.Errorf(
+			return errors.Network(fmt.Errorf(
 				"expected 200 OK (url = %v): %v",
 				src, resp.StatusCode,
-			)
+			))
 		}
 
 		switch n, err := io.Copy(f, resp.Body); {
 		case err != nil:
 			return err
 		case n != resp.ContentLength:
-			return fmt.Errorf(
+			return errors.Network(fmt.Errorf(
 				"content length header didn't match with file size: %v vs %v",
 				resp.ContentLength, n,
-			)
+			))
 		}
 		return nil
 	}
@@ -115,7 +117,7 @@ func Download(ctx context.Context, src, dst string, maxRetries uint) (retErr err
 		if n > 0 {
 			time.Sleep(time.Duration(n+1) * (1_00 * time.Millisecond))
 			if _, err := f.Seek(0, io.SeekStart); err != nil {
-				return err
+				return errors.Generic(err)
 			}
 		}
 		if err = download(); err == nil {
