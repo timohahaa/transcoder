@@ -32,7 +32,6 @@ type Task struct {
 }
 
 type Source struct {
-	S3   *SourceS3   `json:"s3"`
 	HTTP *SourceHTTP `json:"http"`
 	FS   *SourceFS   `json:"fs"`
 }
@@ -51,12 +50,6 @@ func (s *Source) Scan(value any) error {
 
 func (s Source) Value() (driver.Value, error) {
 	return json.Marshal(s)
-}
-
-type SourceS3 struct {
-	Endpoint string `json:"endpoint"`
-	Bucket   string `json:"bucket"`
-	Path     string `json:"path"`
 }
 
 type SourceHTTP struct {
