@@ -3,6 +3,7 @@ package task
 import (
 	"errors"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -22,4 +23,8 @@ func New(conn *pgxpool.Pool) *Module {
 
 func (m *Module) GetForSplitting(hostname string) (Task, error) {
 	return Task{}, nil
+}
+
+func (m *Module) TaskCanceled(id uuid.UUID) (bool, error) {
+	return false, nil
 }

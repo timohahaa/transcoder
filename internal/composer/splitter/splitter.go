@@ -12,11 +12,11 @@ import (
 
 type (
 	Splitter struct {
-		l        *log.Entry
-		httpAddr string
-		redis    redis.UniversalClient
-		mod      mod
-		tasks    chan task.Task
+		l     *log.Entry
+		cfg   Config
+		redis redis.UniversalClient
+		mod   mod
+		tasks chan task.Task
 
 		watcherWG   *sync.WaitGroup
 		workerWG    *sync.WaitGroup
@@ -28,17 +28,22 @@ type (
 	mod struct {
 		task *task.Module
 	}
+
+	Config struct {
+		HttpAddr string
+		WorkDir  string
+	}
 )
 
 func New(
 	conn *pgxpool.Pool,
 	redis redis.UniversalClient,
-	httpAddr string,
+	cfg Config,
 ) *Splitter {
 	return &Splitter{
-		l:        log.WithFields(log.Fields{"mod": "splitter"}),
-		httpAddr: httpAddr,
-		redis:    redis,
+		l:     log.WithFields(log.Fields{"mod": "splitter"}),
+		cfg:   cfg,
+		redis: redis,
 		mod: mod{
 			task: task.New(conn),
 		},

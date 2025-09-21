@@ -1,9 +1,15 @@
 package composer
 
+import (
+	"os"
+	"path/filepath"
+)
+
 type (
 	Config struct {
 		PostgresDSN string `arg:"required,-,--,env:POSTGRES_DSN"`
 		HttpAddr    string `arg:"required,-,--,env:HTTP_ADDR"`
+		WorkDir     string `arg:"-,--,env:WORK_DIR"`
 		Redis
 		Splitter
 	}
@@ -24,5 +30,8 @@ func (c *Config) setDefaults() {
 	}
 	if c.Splitter.Watchers <= 0 {
 		c.Splitter.Watchers = 1
+	}
+	if c.WorkDir == "" {
+		c.WorkDir = filepath.Join(os.TempDir(), "transcoder")
 	}
 }

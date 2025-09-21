@@ -61,11 +61,10 @@ func (srv *Service) Run() error {
 		}
 	)
 
-	splitter := splitter.New(
-		srv.conn,
-		srv.redis,
-		srv.cfg.HttpAddr,
-	)
+	splitter := splitter.New(srv.conn, srv.redis, splitter.Config{
+		HttpAddr: srv.cfg.HttpAddr,
+		WorkDir:  srv.cfg.WorkDir,
+	})
 	splitter.Run(srv.cfg.Splitter.Workers, srv.cfg.Splitter.Watchers)
 
 	signal.Notify(srv.signal, signals...)
