@@ -1,4 +1,4 @@
-package splitter
+package validate
 
 import (
 	"context"
@@ -8,10 +8,11 @@ import (
 	"time"
 
 	"github.com/timohahaa/transcoder/pkg/errors"
+	"github.com/timohahaa/transcoder/pkg/ffmpeg"
 	"github.com/timohahaa/transcoder/pkg/ffprobe"
 )
 
-func (s *Splitter) validate(ctx context.Context, videoFile string, audioFiles []string) error {
+func Pre(ctx context.Context, videoFile string, audioFiles []string) error {
 	var vInfo, err = ffprobe.GetInfo(ctx, videoFile)
 	if err != nil {
 		return err
@@ -49,5 +50,25 @@ func (s *Splitter) validate(ctx context.Context, videoFile string, audioFiles []
 	}
 
 	return nil
+}
 
+func Chunks(ctx context.Context, chunks []ffmpeg.Chunk, sourceInfo *ffprobe.Info) error {
+	var accumDur float64
+
+	for _, c := range chunks {
+		cInfo, err := ffprobe.GetInfo(ctx, c.Path)
+		if err != nil {
+			return err
+		}
+		accumDur += cInfo.GetDuration()
+	}
+
+	if math.Abs(accumDur-sourceInfo.GetDuration()) >= 0.5 {
+		return errors.PreValidation(fmt.Errorf(
+			"got wrong duration after split: original = %v, chunks duration sum = %v",
+			sourceInfo.GetDuration(),
+			accumDur,
+		))
+	}
+	return nil
 }
