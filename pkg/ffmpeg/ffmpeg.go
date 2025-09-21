@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os/exec"
 	"regexp"
+	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -31,23 +32,12 @@ func Version() (string, error) {
 	return result[1], nil
 }
 
-func Check(ctx context.Context, path string) error {
-	args := []string{
-		"-xerror",
-		"-v", "error",
-		"-i", path,
-		"-f", "null",
-		"-",
-	}
-	return Execute(ctx, path, args)
-}
-
-func Execute(ctx context.Context, src string, args []string) error {
+func execute(ctx context.Context, src string, args []string) error {
 	log.WithFields(log.Fields{
 		"mod":  "ffmpeg",
-		"args": args,
+		"args": strings.Join(args, " "),
 		"file": src,
-	}).Debug("")
+	}).Debug("execute")
 
 	cmd := exec.CommandContext(ctx, bin, args...)
 	cmd.Stdout = &bytes.Buffer{}

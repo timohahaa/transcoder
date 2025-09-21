@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/timohahaa/transcoder/internal/composer/modules/task"
 	"github.com/timohahaa/transcoder/pkg/errors"
+	"github.com/timohahaa/transcoder/pkg/ffmpeg"
 	"github.com/timohahaa/transcoder/pkg/ffprobe"
 )
 
@@ -23,7 +24,7 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 	var cleanFull, skipTask bool
 	defer func() {
 		if cleanFull {
-			// clean all files
+			_ = s.cleanFull(t, taskDir)
 		} else {
 			// clean only necessary files
 		}
@@ -66,13 +67,40 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 
 	var sourceInfo *ffprobe.Info
 	if sourceInfo, err = ffprobe.GetInfo(ctx, sourcePath); err != nil {
+		cleanFull = true
 		return t, errors.Splitter(err)
 	}
 	println(sourceInfo)
 
 	// unmux audio/video
+	var (
+		videoFile  string
+		audioFiles []string
+	)
+	if videoFile, err = ffmpeg.UnmuxVideo(
+		ctx,
+		sourceInfo,
+		sourcePath,
+		filepath.Join(taskDir, "videos"),
+	); err != nil {
+		cleanFull = true
+		return t, errors.Unmux(err)
+	}
 
-	// validate
+	if audioFiles, err = ffmpeg.UnmuxAudios(
+		ctx,
+		sourceInfo,
+		sourcePath,
+		filepath.Join(taskDir, "audios"),
+	); err != nil {
+		cleanFull = true
+		return t, errors.Unmux(err)
+	}
+
+	if err := s.validate(ctx, videoFile, audioFiles); err != nil {
+		cleanFull = true
+		return t, err
+	}
 
 	// split source
 

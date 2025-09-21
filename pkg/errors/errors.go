@@ -104,8 +104,8 @@ func EncryptSources(err error) *pb.Error {
 	return New(codes.EncryptSources, "assembler", extractMeta(err))
 }
 
-func UnmuxAudio(err error) *pb.Error {
-	return New(codes.UnmuxAudio, "splitter", extractMeta(err))
+func Unmux(err error) *pb.Error {
+	return New(codes.Unmux, "splitter", extractMeta(err))
 }
 
 func TaskReset() *pb.Error {

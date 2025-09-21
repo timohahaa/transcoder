@@ -15,6 +15,6 @@ const (
 	DB                = "DB_ERROR"
 	Redis             = "REDIS_ERROR"
 	Upload            = "UPLOAD_ERROR"
-	UnmuxAudio        = "UNMUX_AUDIO_ERROR"
+	Unmux             = "UNMUX_ERROR"
 	Validation        = "VALIDATION"
 )
