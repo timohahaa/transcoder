@@ -8,6 +8,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/timohahaa/transcoder/internal/composer/modules/task"
+	"github.com/timohahaa/transcoder/pkg/errors"
 	"github.com/timohahaa/transcoder/pkg/request"
 )
 
@@ -17,7 +18,7 @@ func (s *Splitter) downloadSource(ctx context.Context, t task.Task, dstDir strin
 	var lg = s.l.WithFields(log.Fields{"task_id": t.ID})
 
 	if t.Source.FS == nil && t.Source.HTTP == nil {
-		return "", fmt.Errorf("no source available")
+		return "", errors.Splitter(fmt.Errorf("no source available"))
 	}
 
 	if t.Source.FS != nil {
@@ -29,7 +30,7 @@ func (s *Splitter) downloadSource(ctx context.Context, t task.Task, dstDir strin
 	switch _, err := os.Stat(saveToPath); {
 	case os.IsNotExist(err), err != nil:
 		if err := os.MkdirAll(filepath.Dir(saveToPath), os.ModePerm); err != nil {
-			return "", err
+			return "", errors.Splitter(err)
 		}
 
 		lg.Debugf("download source from: %v", t.Source.HTTP.URL)

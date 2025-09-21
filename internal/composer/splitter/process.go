@@ -7,6 +7,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/timohahaa/transcoder/internal/composer/modules/task"
+	"github.com/timohahaa/transcoder/pkg/errors"
+	"github.com/timohahaa/transcoder/pkg/ffprobe"
 )
 
 func (s *Splitter) process(t task.Task) (task.Task, error) {
@@ -14,13 +16,11 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 		lg          = s.l.WithFields(log.Fields{"task_id": t.ID})
 		ctx, cancel = context.WithCancel(context.Background())
 		taskDir     = filepath.Join(s.cfg.WorkDir, t.ID.String())
-		sourcePath  string
-
-		cleanFull, skipTask bool
-		err                 error
+		err         error
 	)
 	defer cancel()
 
+	var cleanFull, skipTask bool
 	defer func() {
 		if cleanFull {
 			// clean all files
@@ -58,13 +58,17 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 	}
 
 	// download source
+	var sourcePath string
 	if sourcePath, err = s.downloadSource(ctx, t, filepath.Join(taskDir, "source")); err != nil {
 		cleanFull = true
 		return t, err
 	}
-	println(sourcePath)
 
-	// get info
+	var sourceInfo *ffprobe.Info
+	if sourceInfo, err = ffprobe.GetInfo(ctx, sourcePath); err != nil {
+		return t, errors.Splitter(err)
+	}
+	println(sourceInfo)
 
 	// unmux audio/video
 
