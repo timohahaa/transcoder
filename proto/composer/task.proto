@@ -7,9 +7,9 @@ option go_package = "github.com/timohahaa/transcoder/proto/composer";
 package composer;
 
 message Task {
-  bytes                     ID         = 1; // taskID видео-таски
-  int32                     Part       = 2; // номер чанка, чтоб не потерять последовательность
-  int32                     PartsTotal = 3; // всего чанков в глобальной видео-таске
+  bytes                     ID         = 1; // taskID for a video-task 
+  int32                     Part       = 2; // chunk (subtask) number
+  int32                     PartsTotal = 3;
   Video                     Video      = 4;
   Audio                     Audio      = 5;
   string                    Source     = 6; // url
@@ -45,11 +45,11 @@ message Preset {
     int32  GOPSeconds     = 7;
     string Profile        = 8;
     string Level          = 9;
-    int32  CRF            = 10; // -cq для GPU и -crf для CPU
+    int32  CRF            = 10; // -cq for GPU and -crf for CPU
     string ColorTrc       = 11;
     string ColorSpace     = 12;
     string ColorPrimaries = 13;
-    string Tune           = 14; // psnr/ssim/grain/zerolatency/animation/film - содержание видео
+    string Tune           = 14; // psnr/ssim/grain/zerolatency/animation/film - content type
     string Transpose      = 15; // clock/cclock/flip
     bool   IsVertical     = 16;
     int32  Width          = 17;

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/timohahaa/transcoder/internal/composer/modules/analyze"
 	"github.com/timohahaa/transcoder/internal/composer/modules/task"
 	"github.com/timohahaa/transcoder/internal/composer/modules/validate"
 	"github.com/timohahaa/transcoder/pkg/errors"
@@ -115,6 +116,13 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 	}
 
 	// presets
+	var chunkPresets map[string]analyze.ChunkPresets
+	if chunkPresets, err = analyze.CalcChunkPresets(sourceInfo, chunks); err != nil {
+		cleanFull = true
+		return t, errors.Splitter(err)
+	}
+
+	_ = chunkPresets
 
 	// write to redis
 

@@ -28,8 +28,8 @@ message FinishTaskRequest {
 }
 
 message UpdateProgressReq {
-  bytes                     ID         = 1; // taskID видео-таски
-  google.protobuf.Duration  Delta      = 2; // сколько успело закодиться
+  bytes                     ID         = 1; // taskID
+  google.protobuf.Duration  Delta      = 2; // how much was encoded
 }
 
 // see https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto

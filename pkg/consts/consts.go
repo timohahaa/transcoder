@@ -62,4 +62,7 @@ const (
 	TransposeCclock   = "cclock"
 	TransposeClock    = "clock"
 	TransposeReversal = "reversal"
+
+	KBit = 1000
+	Mbit = 1000 * KBit
 )
