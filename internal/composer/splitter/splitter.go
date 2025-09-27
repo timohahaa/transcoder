@@ -7,6 +7,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 	log "github.com/sirupsen/logrus"
+	"github.com/timohahaa/transcoder/internal/composer/modules/queue"
 	"github.com/timohahaa/transcoder/internal/composer/modules/task"
 )
 
@@ -14,7 +15,6 @@ type (
 	Splitter struct {
 		l     *log.Entry
 		cfg   Config
-		redis redis.UniversalClient
 		mod   mod
 		tasks chan task.Task
 
@@ -26,7 +26,8 @@ type (
 	}
 
 	mod struct {
-		task *task.Module
+		task  *task.Module
+		queue *queue.Module
 	}
 
 	Config struct {
@@ -41,11 +42,11 @@ func New(
 	cfg Config,
 ) *Splitter {
 	return &Splitter{
-		l:     log.WithFields(log.Fields{"mod": "splitter"}),
-		cfg:   cfg,
-		redis: redis,
+		l:   log.WithFields(log.Fields{"mod": "splitter"}),
+		cfg: cfg,
 		mod: mod{
-			task: task.New(conn),
+			task:  task.New(conn),
+			queue: queue.New(redis),
 		},
 		tasks: make(chan task.Task),
 
