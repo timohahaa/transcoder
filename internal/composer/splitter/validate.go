@@ -1,4 +1,4 @@
-package validate
+package splitter
 
 import (
 	"context"
@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/timohahaa/transcoder/internal/composer/modules/analyze"
 	"github.com/timohahaa/transcoder/pkg/errors"
-	"github.com/timohahaa/transcoder/pkg/ffmpeg"
 	"github.com/timohahaa/transcoder/pkg/ffprobe"
 )
 
-func Pre(ctx context.Context, videoFile string, audioFiles []string) error {
+func preValidate(ctx context.Context, videoFile string, audioFiles []string) error {
 	var vInfo, err = ffprobe.GetInfo(ctx, videoFile)
 	if err != nil {
 		return err
@@ -52,21 +52,17 @@ func Pre(ctx context.Context, videoFile string, audioFiles []string) error {
 	return nil
 }
 
-func Chunks(ctx context.Context, chunks []ffmpeg.Chunk, sourceInfo *ffprobe.Info) error {
+func validateChunks(chunkPresets map[string]analyze.ChunkPresets, info *ffprobe.Info) error {
 	var accumDur float64
 
-	for _, c := range chunks {
-		cInfo, err := ffprobe.GetInfo(ctx, c.Path)
-		if err != nil {
-			return err
-		}
-		accumDur += cInfo.GetDuration()
+	for _, c := range chunkPresets {
+		accumDur += c.Ffprobe.GetDuration()
 	}
 
-	if math.Abs(accumDur-sourceInfo.GetDuration()) >= 0.5 {
+	if math.Abs(accumDur-info.GetDuration()) >= 0.5 {
 		return errors.PreValidation(fmt.Errorf(
 			"got wrong duration after split: original = %v, chunks duration sum = %v",
-			sourceInfo.GetDuration(),
+			info.GetDuration(),
 			accumDur,
 		))
 	}

@@ -8,7 +8,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/timohahaa/transcoder/internal/composer/modules/analyze"
 	"github.com/timohahaa/transcoder/internal/composer/modules/task"
-	"github.com/timohahaa/transcoder/internal/composer/modules/validate"
 	"github.com/timohahaa/transcoder/pkg/errors"
 	"github.com/timohahaa/transcoder/pkg/ffmpeg"
 	"github.com/timohahaa/transcoder/pkg/ffprobe"
@@ -99,18 +98,13 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 		return t, errors.Unmux(err)
 	}
 
-	if err := validate.Pre(ctx, videoFile, audioFiles); err != nil {
+	if err := preValidate(ctx, videoFile, audioFiles); err != nil {
 		cleanFull = true
 		return t, err
 	}
 
 	var chunks []ffmpeg.Chunk
 	if chunks, err = s.split(ctx, sourceInfo, videoFile, filepath.Join(taskDir, "chunks")); err != nil {
-		cleanFull = true
-		return t, err
-	}
-
-	if err := validate.Chunks(ctx, chunks, sourceInfo); err != nil {
 		cleanFull = true
 		return t, err
 	}
@@ -122,7 +116,10 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 		return t, errors.Splitter(err)
 	}
 
-	_ = chunkPresets
+	if err := validateChunks(chunkPresets, sourceInfo); err != nil {
+		cleanFull = true
+		return t, err
+	}
 
 	// write to redis
 
