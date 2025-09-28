@@ -31,7 +31,8 @@ run-composer:
 	REDIS_USERNAME=redis-user \
 	REDIS_PASSWORD=redis-pass \
 	POSTGRES_DSN=postgres://postgres:password@0.0.0.0:5432/main?sslmode=disable \
-	HTTP_ADDR=localhost:9999 \
+	HTTP_ADDR=localhost:8080 \
+	GRPC_ADDR=localhost:9090 \
 	go run cmd/composer/main.go
 
 run-worker:

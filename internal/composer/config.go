@@ -9,6 +9,7 @@ type (
 	Config struct {
 		PostgresDSN string `arg:"required,-,--,env:POSTGRES_DSN"`
 		HttpAddr    string `arg:"required,-,--,env:HTTP_ADDR"`
+		GrpcAddr    string `arg:"required,-,--,env:GRPC_ADDR"`
 		WorkDir     string `arg:"-,--,env:WORK_DIR"`
 		Redis
 		Splitter
@@ -47,5 +48,8 @@ func (c *Config) setDefaults() {
 	}
 	if c.HttpAddr == "" {
 		c.HttpAddr = ":8080"
+	}
+	if c.GrpcAddr == "" {
+		c.GrpcAddr = ":9090"
 	}
 }
