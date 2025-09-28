@@ -25,7 +25,7 @@ func (a *Assembler) watcher(idx int) {
 	for {
 		select {
 		case <-tick.C:
-			t, err := a.mod.task.GetForSplitting(hostname)
+			t, err := a.mod.task.GetForAssembling(hostname)
 			switch err {
 			case nil:
 				a.tasks <- t

@@ -1,9 +1,11 @@
 package task
 
 import (
+	"context"
 	"errors"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -22,9 +24,60 @@ func New(conn *pgxpool.Pool) *Module {
 }
 
 func (m *Module) GetForSplitting(hostname string) (Task, error) {
-	return Task{}, nil
+	var (
+		t   Task
+		err error
+	)
+
+	err = m.conn.QueryRow(context.Background(), getForSplittingQuery, hostname).Scan(
+		&t.ID,
+		&t.Source,
+		&t.Encoder,
+		&t.Routing,
+		&t.Duration,
+		&t.FileSize,
+		&t.Settings,
+	)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return Task{}, ErrNoTasks
+	}
+	return t, nil
+}
+
+func (m *Module) GetForAssembling(hostname string) (Task, error) {
+	var (
+		t   Task
+		err error
+	)
+
+	err = m.conn.QueryRow(context.Background(), getForAssemblingQuery, hostname).Scan(
+		&t.ID,
+		&t.Source,
+		&t.Encoder,
+		&t.Routing,
+		&t.Duration,
+		&t.FileSize,
+		&t.Settings,
+	)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return Task{}, ErrNoTasks
+	}
+	return t, nil
 }
 
 func (m *Module) TaskCanceled(id uuid.UUID) (bool, error) {
-	return false, nil
+	var (
+		isCanceled bool
+		err        error
+	)
+
+	err = m.conn.QueryRow(
+		context.Background(),
+		checkCancellationQuery,
+		id,
+	).Scan(&isCanceled)
+
+	return isCanceled, err
 }
