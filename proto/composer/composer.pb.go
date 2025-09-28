@@ -146,8 +146,8 @@ func (x *FinishTaskRequest) GetFinishedAt() *timestamppb.Timestamp {
 
 type UpdateProgressReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            []byte                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`       // taskID видео-таски
-	Delta         *durationpb.Duration   `protobuf:"bytes,2,opt,name=Delta,proto3" json:"Delta,omitempty"` // сколько успело закодиться
+	ID            []byte                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`       // taskID
+	Delta         *durationpb.Duration   `protobuf:"bytes,2,opt,name=Delta,proto3" json:"Delta,omitempty"` // how much was encoded
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

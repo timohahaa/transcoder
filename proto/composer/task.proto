@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
+import "proto/composer/preset.proto";
 
 option go_package = "github.com/timohahaa/transcoder/proto/composer";
 
@@ -19,10 +20,11 @@ message Task {
 }
 
 message Audio {
-  string Codec    = 1; 
-  int64  BitRate  = 2;
-  float  Duration = 3;
-  int32  TrackNum = 4;
+  string      Codec    = 1; 
+  int64       BitRate  = 2;
+  float       Duration = 3;
+  int32       TrackNum = 4;
+  AudioPreset Preset   = 5;
 }
 
 message Video  {
@@ -34,25 +36,3 @@ message Video  {
            bool   CreatePoster = 6;
   repeated Preset Presets      = 7;
 }
-
-message Preset {
-    string Quality        = 1; // 360, 720, 1440, etc...
-    int64  MaxBitRate     = 2;
-    int64  MinBitRate     = 3;
-    string FPS            = 4;
-    string Codec          = 5;
-    int64  Bufsize        = 6;
-    int32  GOPSeconds     = 7;
-    string Profile        = 8;
-    string Level          = 9;
-    int32  CRF            = 10; // -cq for GPU and -crf for CPU
-    string ColorTrc       = 11;
-    string ColorSpace     = 12;
-    string ColorPrimaries = 13;
-    string Tune           = 14; // psnr/ssim/grain/zerolatency/animation/film - content type
-    string Transpose      = 15; // clock/cclock/flip
-    bool   IsVertical     = 16;
-    int32  Width          = 17;
-    int32  Height         = 18;
-}
-

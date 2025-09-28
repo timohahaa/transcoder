@@ -24,9 +24,9 @@ const (
 
 type Task struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            []byte                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`                  // taskID видео-таски
-	Part          int32                  `protobuf:"varint,2,opt,name=Part,proto3" json:"Part,omitempty"`             // номер чанка, чтоб не потерять последовательность
-	PartsTotal    int32                  `protobuf:"varint,3,opt,name=PartsTotal,proto3" json:"PartsTotal,omitempty"` // всего чанков в глобальной видео-таске
+	ID            []byte                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`      // taskID for a video-task
+	Part          int32                  `protobuf:"varint,2,opt,name=Part,proto3" json:"Part,omitempty"` // chunk (subtask) number
+	PartsTotal    int32                  `protobuf:"varint,3,opt,name=PartsTotal,proto3" json:"PartsTotal,omitempty"`
 	Video         *Video                 `protobuf:"bytes,4,opt,name=Video,proto3" json:"Video,omitempty"`
 	Audio         *Audio                 `protobuf:"bytes,5,opt,name=Audio,proto3" json:"Audio,omitempty"`
 	Source        string                 `protobuf:"bytes,6,opt,name=Source,proto3" json:"Source,omitempty"` // url
@@ -136,6 +136,7 @@ type Audio struct {
 	BitRate       int64                  `protobuf:"varint,2,opt,name=BitRate,proto3" json:"BitRate,omitempty"`
 	Duration      float32                `protobuf:"fixed32,3,opt,name=Duration,proto3" json:"Duration,omitempty"`
 	TrackNum      int32                  `protobuf:"varint,4,opt,name=TrackNum,proto3" json:"TrackNum,omitempty"`
+	Preset        *AudioPreset           `protobuf:"bytes,5,opt,name=Preset,proto3" json:"Preset,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -196,6 +197,13 @@ func (x *Audio) GetTrackNum() int32 {
 		return x.TrackNum
 	}
 	return 0
+}
+
+func (x *Audio) GetPreset() *AudioPreset {
+	if x != nil {
+		return x.Preset
+	}
+	return nil
 }
 
 type Video struct {
@@ -290,191 +298,11 @@ func (x *Video) GetPresets() []*Preset {
 	return nil
 }
 
-type Preset struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Quality        string                 `protobuf:"bytes,1,opt,name=Quality,proto3" json:"Quality,omitempty"` // 360, 720, 1440, etc...
-	MaxBitRate     int64                  `protobuf:"varint,2,opt,name=MaxBitRate,proto3" json:"MaxBitRate,omitempty"`
-	MinBitRate     int64                  `protobuf:"varint,3,opt,name=MinBitRate,proto3" json:"MinBitRate,omitempty"`
-	FPS            string                 `protobuf:"bytes,4,opt,name=FPS,proto3" json:"FPS,omitempty"`
-	Codec          string                 `protobuf:"bytes,5,opt,name=Codec,proto3" json:"Codec,omitempty"`
-	Bufsize        int64                  `protobuf:"varint,6,opt,name=Bufsize,proto3" json:"Bufsize,omitempty"`
-	GOPSeconds     int32                  `protobuf:"varint,7,opt,name=GOPSeconds,proto3" json:"GOPSeconds,omitempty"`
-	Profile        string                 `protobuf:"bytes,8,opt,name=Profile,proto3" json:"Profile,omitempty"`
-	Level          string                 `protobuf:"bytes,9,opt,name=Level,proto3" json:"Level,omitempty"`
-	CRF            int32                  `protobuf:"varint,10,opt,name=CRF,proto3" json:"CRF,omitempty"` // -cq для GPU и -crf для CPU
-	ColorTrc       string                 `protobuf:"bytes,11,opt,name=ColorTrc,proto3" json:"ColorTrc,omitempty"`
-	ColorSpace     string                 `protobuf:"bytes,12,opt,name=ColorSpace,proto3" json:"ColorSpace,omitempty"`
-	ColorPrimaries string                 `protobuf:"bytes,13,opt,name=ColorPrimaries,proto3" json:"ColorPrimaries,omitempty"`
-	Tune           string                 `protobuf:"bytes,14,opt,name=Tune,proto3" json:"Tune,omitempty"`           // psnr/ssim/grain/zerolatency/animation/film - содержание видео
-	Transpose      string                 `protobuf:"bytes,15,opt,name=Transpose,proto3" json:"Transpose,omitempty"` // clock/cclock/flip
-	IsVertical     bool                   `protobuf:"varint,16,opt,name=IsVertical,proto3" json:"IsVertical,omitempty"`
-	Width          int32                  `protobuf:"varint,17,opt,name=Width,proto3" json:"Width,omitempty"`
-	Height         int32                  `protobuf:"varint,18,opt,name=Height,proto3" json:"Height,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *Preset) Reset() {
-	*x = Preset{}
-	mi := &file_proto_composer_task_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Preset) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Preset) ProtoMessage() {}
-
-func (x *Preset) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_composer_task_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Preset.ProtoReflect.Descriptor instead.
-func (*Preset) Descriptor() ([]byte, []int) {
-	return file_proto_composer_task_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *Preset) GetQuality() string {
-	if x != nil {
-		return x.Quality
-	}
-	return ""
-}
-
-func (x *Preset) GetMaxBitRate() int64 {
-	if x != nil {
-		return x.MaxBitRate
-	}
-	return 0
-}
-
-func (x *Preset) GetMinBitRate() int64 {
-	if x != nil {
-		return x.MinBitRate
-	}
-	return 0
-}
-
-func (x *Preset) GetFPS() string {
-	if x != nil {
-		return x.FPS
-	}
-	return ""
-}
-
-func (x *Preset) GetCodec() string {
-	if x != nil {
-		return x.Codec
-	}
-	return ""
-}
-
-func (x *Preset) GetBufsize() int64 {
-	if x != nil {
-		return x.Bufsize
-	}
-	return 0
-}
-
-func (x *Preset) GetGOPSeconds() int32 {
-	if x != nil {
-		return x.GOPSeconds
-	}
-	return 0
-}
-
-func (x *Preset) GetProfile() string {
-	if x != nil {
-		return x.Profile
-	}
-	return ""
-}
-
-func (x *Preset) GetLevel() string {
-	if x != nil {
-		return x.Level
-	}
-	return ""
-}
-
-func (x *Preset) GetCRF() int32 {
-	if x != nil {
-		return x.CRF
-	}
-	return 0
-}
-
-func (x *Preset) GetColorTrc() string {
-	if x != nil {
-		return x.ColorTrc
-	}
-	return ""
-}
-
-func (x *Preset) GetColorSpace() string {
-	if x != nil {
-		return x.ColorSpace
-	}
-	return ""
-}
-
-func (x *Preset) GetColorPrimaries() string {
-	if x != nil {
-		return x.ColorPrimaries
-	}
-	return ""
-}
-
-func (x *Preset) GetTune() string {
-	if x != nil {
-		return x.Tune
-	}
-	return ""
-}
-
-func (x *Preset) GetTranspose() string {
-	if x != nil {
-		return x.Transpose
-	}
-	return ""
-}
-
-func (x *Preset) GetIsVertical() bool {
-	if x != nil {
-		return x.IsVertical
-	}
-	return false
-}
-
-func (x *Preset) GetWidth() int32 {
-	if x != nil {
-		return x.Width
-	}
-	return 0
-}
-
-func (x *Preset) GetHeight() int32 {
-	if x != nil {
-		return x.Height
-	}
-	return 0
-}
-
 var File_proto_composer_task_proto protoreflect.FileDescriptor
 
 const file_proto_composer_task_proto_rawDesc = "" +
 	"\n" +
-	"\x19proto/composer/task.proto\x12\bcomposer\x1a\x1fgoogle/protobuf/timestamp.proto\"\xf9\x02\n" +
+	"\x19proto/composer/task.proto\x12\bcomposer\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bproto/composer/preset.proto\"\xf9\x02\n" +
 	"\x04Task\x12\x0e\n" +
 	"\x02ID\x18\x01 \x01(\fR\x02ID\x12\x12\n" +
 	"\x04Part\x18\x02 \x01(\x05R\x04Part\x12\x1e\n" +
@@ -489,12 +317,13 @@ const file_proto_composer_task_proto_rawDesc = "" +
 	"\bFeatures\x18\t \x03(\v2\x1c.composer.Task.FeaturesEntryR\bFeatures\x1a;\n" +
 	"\rFeaturesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\bR\x05value:\x028\x01\"o\n" +
+	"\x05value\x18\x02 \x01(\bR\x05value:\x028\x01\"\x9e\x01\n" +
 	"\x05Audio\x12\x14\n" +
 	"\x05Codec\x18\x01 \x01(\tR\x05Codec\x12\x18\n" +
 	"\aBitRate\x18\x02 \x01(\x03R\aBitRate\x12\x1a\n" +
 	"\bDuration\x18\x03 \x01(\x02R\bDuration\x12\x1a\n" +
-	"\bTrackNum\x18\x04 \x01(\x05R\bTrackNum\"\xd5\x01\n" +
+	"\bTrackNum\x18\x04 \x01(\x05R\bTrackNum\x12-\n" +
+	"\x06Preset\x18\x05 \x01(\v2\x15.composer.AudioPresetR\x06Preset\"\xd5\x01\n" +
 	"\x05Video\x12\x14\n" +
 	"\x05Codec\x18\x01 \x01(\tR\x05Codec\x12\x18\n" +
 	"\aBitRate\x18\x02 \x01(\x03R\aBitRate\x12\x1a\n" +
@@ -502,37 +331,7 @@ const file_proto_composer_task_proto_rawDesc = "" +
 	"\aQuality\x18\x04 \x01(\tR\aQuality\x12\x16\n" +
 	"\x06PixFmt\x18\x05 \x01(\tR\x06PixFmt\x12\"\n" +
 	"\fCreatePoster\x18\x06 \x01(\bR\fCreatePoster\x12*\n" +
-	"\aPresets\x18\a \x03(\v2\x10.composer.PresetR\aPresets\"\xea\x03\n" +
-	"\x06Preset\x12\x18\n" +
-	"\aQuality\x18\x01 \x01(\tR\aQuality\x12\x1e\n" +
-	"\n" +
-	"MaxBitRate\x18\x02 \x01(\x03R\n" +
-	"MaxBitRate\x12\x1e\n" +
-	"\n" +
-	"MinBitRate\x18\x03 \x01(\x03R\n" +
-	"MinBitRate\x12\x10\n" +
-	"\x03FPS\x18\x04 \x01(\tR\x03FPS\x12\x14\n" +
-	"\x05Codec\x18\x05 \x01(\tR\x05Codec\x12\x18\n" +
-	"\aBufsize\x18\x06 \x01(\x03R\aBufsize\x12\x1e\n" +
-	"\n" +
-	"GOPSeconds\x18\a \x01(\x05R\n" +
-	"GOPSeconds\x12\x18\n" +
-	"\aProfile\x18\b \x01(\tR\aProfile\x12\x14\n" +
-	"\x05Level\x18\t \x01(\tR\x05Level\x12\x10\n" +
-	"\x03CRF\x18\n" +
-	" \x01(\x05R\x03CRF\x12\x1a\n" +
-	"\bColorTrc\x18\v \x01(\tR\bColorTrc\x12\x1e\n" +
-	"\n" +
-	"ColorSpace\x18\f \x01(\tR\n" +
-	"ColorSpace\x12&\n" +
-	"\x0eColorPrimaries\x18\r \x01(\tR\x0eColorPrimaries\x12\x12\n" +
-	"\x04Tune\x18\x0e \x01(\tR\x04Tune\x12\x1c\n" +
-	"\tTranspose\x18\x0f \x01(\tR\tTranspose\x12\x1e\n" +
-	"\n" +
-	"IsVertical\x18\x10 \x01(\bR\n" +
-	"IsVertical\x12\x14\n" +
-	"\x05Width\x18\x11 \x01(\x05R\x05Width\x12\x16\n" +
-	"\x06Height\x18\x12 \x01(\x05R\x06HeightB0Z.github.com/timohahaa/transcoder/proto/composerb\x06proto3"
+	"\aPresets\x18\a \x03(\v2\x10.composer.PresetR\aPresetsB0Z.github.com/timohahaa/transcoder/proto/composerb\x06proto3"
 
 var (
 	file_proto_composer_task_proto_rawDescOnce sync.Once
@@ -546,26 +345,28 @@ func file_proto_composer_task_proto_rawDescGZIP() []byte {
 	return file_proto_composer_task_proto_rawDescData
 }
 
-var file_proto_composer_task_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_proto_composer_task_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_proto_composer_task_proto_goTypes = []any{
 	(*Task)(nil),                  // 0: composer.Task
 	(*Audio)(nil),                 // 1: composer.Audio
 	(*Video)(nil),                 // 2: composer.Video
-	(*Preset)(nil),                // 3: composer.Preset
-	nil,                           // 4: composer.Task.FeaturesEntry
-	(*timestamppb.Timestamp)(nil), // 5: google.protobuf.Timestamp
+	nil,                           // 3: composer.Task.FeaturesEntry
+	(*timestamppb.Timestamp)(nil), // 4: google.protobuf.Timestamp
+	(*AudioPreset)(nil),           // 5: composer.AudioPreset
+	(*Preset)(nil),                // 6: composer.Preset
 }
 var file_proto_composer_task_proto_depIdxs = []int32{
 	2, // 0: composer.Task.Video:type_name -> composer.Video
 	1, // 1: composer.Task.Audio:type_name -> composer.Audio
-	5, // 2: composer.Task.CreatedAt:type_name -> google.protobuf.Timestamp
-	4, // 3: composer.Task.Features:type_name -> composer.Task.FeaturesEntry
-	3, // 4: composer.Video.Presets:type_name -> composer.Preset
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	4, // 2: composer.Task.CreatedAt:type_name -> google.protobuf.Timestamp
+	3, // 3: composer.Task.Features:type_name -> composer.Task.FeaturesEntry
+	5, // 4: composer.Audio.Preset:type_name -> composer.AudioPreset
+	6, // 5: composer.Video.Presets:type_name -> composer.Preset
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_proto_composer_task_proto_init() }
@@ -573,13 +374,14 @@ func file_proto_composer_task_proto_init() {
 	if File_proto_composer_task_proto != nil {
 		return
 	}
+	file_proto_composer_preset_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_composer_task_proto_rawDesc), len(file_proto_composer_task_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

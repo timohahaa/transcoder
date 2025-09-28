@@ -74,7 +74,6 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 		cleanFull = true
 		return t, errors.Splitter(err)
 	}
-	println(sourceInfo)
 
 	// unmux audio/video
 	var (
@@ -89,6 +88,16 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 	); err != nil {
 		cleanFull = true
 		return t, errors.Unmux(err)
+	}
+
+	// Need to update ffprobe info after unmux.
+	// Cause for some containers like mkv there is no stream duration in ffprobe,
+	// It means that video and audio files can have different duration
+	// only format duration.
+	// and we wont know it unless we unmux the file
+	if sourceInfo, err = ffprobe.GetInfo(ctx, videoFile); err != nil {
+		cleanFull = true
+		return t, errors.Splitter(err)
 	}
 
 	if audioFiles, err = ffmpeg.UnmuxAudios(
@@ -124,8 +133,22 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 		return t, err
 	}
 
+	var audioPresets map[string]analyze.AudioPreset
+	if audioPresets, err = analyze.CalcAudioPresets(ctx, sourceInfo, audioFiles); err != nil {
+		cleanFull = true
+		return t, errors.Splitter(err)
+	}
+
 	// write subtasks to redis queue
-	if err := s.writeToRedis(ctx, t, sourceInfo, chunks, chunkPresets); err != nil {
+	if err := s.writeToRedis(
+		ctx,
+		t,
+		sourceInfo,
+		chunks,
+		chunkPresets,
+		audioFiles,
+		audioPresets,
+	); err != nil {
 		cleanFull = true
 		skipTask = true
 		return t, err
@@ -142,6 +165,8 @@ func (s *Splitter) writeToRedis(
 	info *ffprobe.Info,
 	chunks []ffmpeg.Chunk,
 	chunkPresets map[string]analyze.ChunkPresets,
+	audioFiles []string,
+	audioPresets map[string]analyze.AudioPreset,
 ) error {
 	var lg = s.l.WithFields(log.Fields{"task_id": t.ID})
 
@@ -162,15 +187,15 @@ func (s *Splitter) writeToRedis(
 		tPb = pb.Task{
 			ID: t.ID[:],
 			// Part: 0, // changes from chunk to chunk
-			PartsTotal: int32(len(chunks)),
+			PartsTotal: int32(len(chunks) + len(audioFiles)),
 			Video:      &vPb,
 			Audio:      nil,
 			// Source: "", // changes from chunk to chunk
 			PushTo:    s.cfg.HttpAddr,
 			CreatedAt: timestamppb.Now(),
 		}
-		baseChunkUrl string
-		queueKey     = t.Routing
+		queueKey                   = t.Routing
+		baseChunkUrl, baseAudioUrl string
 	)
 	{
 		parsedUrl, err := url.Parse("http://" + s.cfg.HttpAddr + "/v1/chunk")
@@ -182,8 +207,18 @@ func (s *Splitter) writeToRedis(
 		parsedUrl.RawQuery = q.Encode()
 		baseChunkUrl = parsedUrl.String()
 	}
+	{
+		parsedUrl, err := url.Parse("http://" + s.cfg.HttpAddr + "/v1/audio")
+		if err != nil {
+			return errors.Splitter(err)
+		}
+		q := url.Values{}
+		q.Add("task_id", t.ID.String())
+		parsedUrl.RawQuery = q.Encode()
+		baseAudioUrl = parsedUrl.String()
+	}
 
-	lg.Debugf("adding chunks to queue: %v", queueKey)
+	lg.Debugf("adding subtasks to queue: %v", queueKey)
 
 	for i, chunk := range chunks {
 		chunkSource := baseChunkUrl + "&filepath=" + chunk.Path
@@ -195,6 +230,26 @@ func (s *Splitter) writeToRedis(
 		tPb.Video.BitRate = chunkInfo.Ffprobe.Format.BitRate
 		tPb.Video.Duration = float32(chunkInfo.Ffprobe.GetDuration())
 		tPb.Video.CreatePoster = chunk.Num == 0
+
+		if err := s.mod.queue.AddSubtask(ctx, queueKey, &tPb); err != nil {
+			return err
+		}
+	}
+
+	tPb.Video = nil
+	for i, filePath := range audioFiles {
+		audioSource := baseAudioUrl + "&filepath=" + filePath
+		audioPreset := audioPresets[filePath]
+
+		tPb.Part = int32(i + len(chunks))
+		tPb.Source = audioSource
+		tPb.Audio = &pb.Audio{
+			Codec:    audioPreset.Ffprobe.GetAllAudios()[0].CodecName,
+			BitRate:  audioPreset.Ffprobe.Format.BitRate,
+			Duration: float32(audioPreset.Ffprobe.GetDuration()),
+			TrackNum: int32(i),
+			Preset:   audioPreset.Preset,
+		}
 
 		if err := s.mod.queue.AddSubtask(ctx, queueKey, &tPb); err != nil {
 			return err

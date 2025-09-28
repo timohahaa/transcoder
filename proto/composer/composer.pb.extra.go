@@ -50,3 +50,16 @@ func (e *Error) Error() string {
 func (e *Error) Value() (driver.Value, error) {
 	return json.Marshal(e)
 }
+
+func (ap *AudioPreset) Copy() *AudioPreset {
+	if ap == nil {
+		return nil
+	}
+	return &AudioPreset{
+		Channels:   ap.Channels,
+		Bitrate:    ap.Bitrate,
+		SampleRate: ap.SampleRate,
+		PadBefore:  ap.PadBefore,
+		PadAfter:   ap.PadAfter,
+	}
+}
