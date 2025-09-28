@@ -45,4 +45,7 @@ func (c *Config) setDefaults() {
 	if c.WorkDir == "" {
 		c.WorkDir = filepath.Join(os.TempDir(), "transcoder")
 	}
+	if c.HttpAddr == "" {
+		c.HttpAddr = ":8080"
+	}
 }

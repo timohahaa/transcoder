@@ -4,10 +4,12 @@ go 1.25.1
 
 require (
 	github.com/alexflint/go-arg v1.6.0
+	github.com/go-chi/chi/v5 v5.2.3
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.7.6
 	github.com/redis/go-redis/v9 v9.14.0
 	github.com/sirupsen/logrus v1.9.3
+	golang.org/x/net v0.41.0
 	golang.org/x/term v0.32.0
 	google.golang.org/grpc v1.75.1
 	google.golang.org/protobuf v1.36.9
@@ -21,7 +23,6 @@ require (
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	golang.org/x/crypto v0.39.0 // indirect
-	golang.org/x/net v0.41.0 // indirect
 	golang.org/x/sync v0.15.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.26.0 // indirect

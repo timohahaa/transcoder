@@ -40,10 +40,13 @@ func (m *Module) GetForSplitting(hostname string) (Task, error) {
 		&t.FileSize,
 		&t.Settings,
 	)
-
-	if stdErrors.Is(err, pgx.ErrNoRows) {
-		return Task{}, ErrNoTasks
+	if err != nil {
+		if stdErrors.Is(err, pgx.ErrNoRows) {
+			return Task{}, ErrNoTasks
+		}
+		return Task{}, err
 	}
+
 	return t, nil
 }
 
@@ -62,10 +65,13 @@ func (m *Module) GetForAssembling(hostname string) (Task, error) {
 		&t.FileSize,
 		&t.Settings,
 	)
-
-	if stdErrors.Is(err, pgx.ErrNoRows) {
-		return Task{}, ErrNoTasks
+	if err != nil {
+		if stdErrors.Is(err, pgx.ErrNoRows) {
+			return Task{}, ErrNoTasks
+		}
+		return Task{}, err
 	}
+
 	return t, nil
 }
 

@@ -201,7 +201,7 @@ func (s *Splitter) writeToRedis(
 		baseChunkUrl, baseAudioUrl string
 	)
 	{
-		parsedUrl, err := url.Parse("http://" + s.cfg.HttpAddr + "/v1/chunk")
+		parsedUrl, err := url.Parse("http://" + s.cfg.HttpAddr + "/v1/files/chunk")
 		if err != nil {
 			return errors.Splitter(err)
 		}
@@ -211,7 +211,7 @@ func (s *Splitter) writeToRedis(
 		baseChunkUrl = parsedUrl.String()
 	}
 	{
-		parsedUrl, err := url.Parse("http://" + s.cfg.HttpAddr + "/v1/audio")
+		parsedUrl, err := url.Parse("http://" + s.cfg.HttpAddr + "/v1/files/audio")
 		if err != nil {
 			return errors.Splitter(err)
 		}

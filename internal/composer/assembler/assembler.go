@@ -93,7 +93,7 @@ func (a *Assembler) worker(idx int) {
 	for {
 		select {
 		case <-a.workerDone:
-			for task := range a.tasks {
+			for task := range a.tasks { // finish whats left before exit
 				st := time.Now()
 				t, err := a.process(task)
 				a.finishTask(t, err, time.Since(st))
@@ -101,7 +101,7 @@ func (a *Assembler) worker(idx int) {
 			return
 		case task, ok := <-a.tasks:
 			if !ok {
-				return
+				continue
 			}
 			st := time.Now()
 			t, err := a.process(task)

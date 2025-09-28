@@ -2,6 +2,7 @@ package splitter
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -98,7 +99,7 @@ func (s *Splitter) worker(idx int) {
 	for {
 		select {
 		case <-s.workerDone:
-			for task := range s.tasks {
+			for task := range s.tasks { // finish whats left before exit
 				st := time.Now()
 				t, err := s.process(task)
 				s.finishTask(t, err, time.Since(st))
@@ -106,8 +107,9 @@ func (s *Splitter) worker(idx int) {
 			return
 		case task, ok := <-s.tasks:
 			if !ok {
-				return
+				continue
 			}
+			fmt.Println(task)
 			st := time.Now()
 			t, err := s.process(task)
 			s.finishTask(t, err, time.Since(st))

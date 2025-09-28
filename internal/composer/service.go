@@ -2,11 +2,15 @@ package composer
 
 import (
 	"context"
+	"errors"
+	"net/http"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 	log "github.com/sirupsen/logrus"
@@ -18,17 +22,27 @@ type Service struct {
 	cfg    Config
 	signal chan os.Signal
 
-	redis redis.UniversalClient
-	conn  *pgxpool.Pool
+	mux    *chi.Mux
+	server http.Server
+	redis  redis.UniversalClient
+	conn   *pgxpool.Pool
 }
 
 func New(cfg Config) (*Service, error) {
 	cfg.setDefaults()
 
 	var (
-		s = &Service{
+		mux = chi.NewMux()
+		s   = &Service{
 			cfg:    cfg,
 			signal: make(chan os.Signal),
+			mux:    mux,
+			server: http.Server{
+				Addr:         cfg.HttpAddr,
+				Handler:      mux,
+				ReadTimeout:  15 * time.Second, // so bit, cause sending and receiving video-files
+				WriteTimeout: 15 * time.Second,
+			},
 		}
 		err error
 	)
@@ -62,6 +76,17 @@ func (srv *Service) Run() error {
 		}
 	)
 
+	log.Infof("HTTP server listening on: %s", srv.cfg.HttpAddr)
+	go func() {
+		if err := srv.server.ListenAndServe(); err != nil {
+			if errors.Is(err, http.ErrServerClosed) {
+				log.Warn("HTTP server: closed.")
+			} else {
+				log.Fatalf("HTTP server: %v", err)
+			}
+		}
+	}()
+
 	splitter := splitter.New(srv.conn, srv.redis, splitter.Config{
 		HttpAddr: srv.cfg.HttpAddr,
 		WorkDir:  srv.cfg.WorkDir,
@@ -76,6 +101,10 @@ func (srv *Service) Run() error {
 	signal.Notify(srv.signal, signals...)
 	signal := <-srv.signal
 	log.Infof("got signal: %s", signal)
+
+	if err := srv.server.Shutdown(context.Background()); err != nil {
+		log.Errorf("shutdown HTTP server: %v", err)
+	}
 
 	{
 		wg := sync.WaitGroup{}
