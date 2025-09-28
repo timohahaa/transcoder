@@ -61,4 +61,14 @@ const (
 	FROM transcoder.queue
 	WHERE task_id = $1
 	`
+
+	updateTaskStatusQuery = `
+    UPDATE transcoder.queue
+    SET
+        updated_at = CURRENT_TIMESTAMP
+        , status = $2
+        , error = $3
+    WHERE task_id = $1
+		AND status != 'done'
+    `
 )

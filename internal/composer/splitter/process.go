@@ -155,6 +155,9 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 	}
 
 	// update db
+	if err := s.mod.task.UpdateStatus(ctx, t.ID, task.StatusEncoding, nil); err != nil {
+		return t, errors.DB(err)
+	}
 
 	return t, nil
 }

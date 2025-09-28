@@ -14,11 +14,15 @@ const (
 )
 
 const (
-	StatusSplitting         = "splitting"
-	StatusAssembling        = "assembling"
-	StatusError             = "error"
+	StatusPending           = "pending"
 	StatusWaitingSplitting  = "waiting-splitting"
+	StatusSplitting         = "splitting"
+	StatusEncoding          = "encoding"
 	StatusWaitingAssembling = "waiting-assembling"
+	StatusAssembling        = "assembling"
+	StatusDone              = "done"
+	StatusError             = "error"
+	StatusCanceled          = "canceled"
 )
 
 type Task struct {
