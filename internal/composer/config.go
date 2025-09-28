@@ -12,6 +12,7 @@ type (
 		WorkDir     string `arg:"-,--,env:WORK_DIR"`
 		Redis
 		Splitter
+		Assembler
 	}
 	Redis struct {
 		Addrs    []string `arg:"required,-,--,env:REDIS_ADDRS"`
@@ -22,6 +23,10 @@ type (
 		Workers  int `arg:"-,--,env:SPLITTER_WORKERS"`
 		Watchers int `arg:"-,--,env:SPLITTER_WATCHERS"`
 	}
+	Assembler struct {
+		Workers  int `arg:"-,--,env:ASSEMBLER_WORKERS"`
+		Watchers int `arg:"-,--,env:ASSEMBLER_WATCHERS"`
+	}
 )
 
 func (c *Config) setDefaults() {
@@ -30,6 +35,12 @@ func (c *Config) setDefaults() {
 	}
 	if c.Splitter.Watchers <= 0 {
 		c.Splitter.Watchers = 1
+	}
+	if c.Assembler.Workers <= 0 {
+		c.Assembler.Workers = 5
+	}
+	if c.Assembler.Watchers <= 0 {
+		c.Assembler.Watchers = 1
 	}
 	if c.WorkDir == "" {
 		c.WorkDir = filepath.Join(os.TempDir(), "transcoder")

@@ -1,6 +1,7 @@
 package splitter
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -9,6 +10,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/timohahaa/transcoder/internal/composer/modules/queue"
 	"github.com/timohahaa/transcoder/internal/composer/modules/task"
+	"github.com/timohahaa/transcoder/pkg/errors"
+	pb "github.com/timohahaa/transcoder/proto/composer"
 )
 
 type (
@@ -112,4 +115,23 @@ func (s *Splitter) worker(idx int) {
 	}
 }
 
-func (s *Splitter) finishTask(t task.Task, err error, duration time.Duration) {}
+func (s *Splitter) finishTask(t task.Task, err error, duration time.Duration) {
+	if err == nil {
+		return
+	}
+
+	var (
+		pbErr *pb.Error
+		lg    = log.WithFields(log.Fields{"task_id": t.ID})
+	)
+	switch e := err.(type) {
+	case *pb.Error:
+		pbErr = e
+	default:
+		pbErr = errors.Unknown(e)
+	}
+
+	if err := s.mod.task.UpdateStatus(context.Background(), t.ID, task.StatusError, pbErr); err != nil {
+		lg.Errorf("update task status: %v", err)
+	}
+}

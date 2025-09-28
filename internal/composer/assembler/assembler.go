@@ -1,19 +1,21 @@
 package assembler
 
 import (
+	"context"
 	"sync"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/redis/go-redis/v9"
 	log "github.com/sirupsen/logrus"
 	"github.com/timohahaa/transcoder/internal/composer/modules/task"
+	"github.com/timohahaa/transcoder/pkg/errors"
+	pb "github.com/timohahaa/transcoder/proto/composer"
 )
 
 type (
 	Assembler struct {
 		l     *log.Entry
-		redis redis.UniversalClient
+		cfg   Config
 		mod   mod
 		tasks chan task.Task
 
@@ -27,15 +29,20 @@ type (
 	mod struct {
 		task *task.Module
 	}
+
+	Config struct {
+		HttpAddr string
+		WorkDir  string
+	}
 )
 
 func New(
 	conn *pgxpool.Pool,
-	redis redis.UniversalClient,
+	cfg Config,
 ) *Assembler {
 	return &Assembler{
-		l:     log.WithFields(log.Fields{"mod": "assembler"}),
-		redis: redis,
+		l:   log.WithFields(log.Fields{"mod": "assembler"}),
+		cfg: cfg,
 		mod: mod{
 			task: task.New(conn),
 		},
@@ -103,4 +110,23 @@ func (a *Assembler) worker(idx int) {
 	}
 }
 
-func (a *Assembler) finishTask(t task.Task, err error, duration time.Duration) {}
+func (a *Assembler) finishTask(t task.Task, err error, duration time.Duration) {
+	if err == nil {
+		return
+	}
+
+	var (
+		pbErr *pb.Error
+		lg    = log.WithFields(log.Fields{"task_id": t.ID})
+	)
+	switch e := err.(type) {
+	case *pb.Error:
+		pbErr = e
+	default:
+		pbErr = errors.Unknown(e)
+	}
+
+	if err := a.mod.task.UpdateStatus(context.Background(), t.ID, task.StatusError, pbErr); err != nil {
+		lg.Errorf("update task status: %v", err)
+	}
+}

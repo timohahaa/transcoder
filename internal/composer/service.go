@@ -10,6 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 	log "github.com/sirupsen/logrus"
+	"github.com/timohahaa/transcoder/internal/composer/assembler"
 	"github.com/timohahaa/transcoder/internal/composer/splitter"
 )
 
@@ -67,17 +68,19 @@ func (srv *Service) Run() error {
 	})
 	splitter.Run(srv.cfg.Splitter.Workers, srv.cfg.Splitter.Watchers)
 
+	assembler := assembler.New(srv.conn, assembler.Config{
+		WorkDir: srv.cfg.WorkDir,
+	})
+	assembler.Run(srv.cfg.Assembler.Workers, srv.cfg.Assembler.Watchers)
+
 	signal.Notify(srv.signal, signals...)
 	signal := <-srv.signal
 	log.Infof("got signal: %s", signal)
 
 	{
 		wg := sync.WaitGroup{}
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			splitter.Shutdown()
-		}()
+		wg.Go(splitter.Shutdown)
+		wg.Go(assembler.Shutdown)
 		wg.Wait()
 	}
 
