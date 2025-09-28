@@ -36,7 +36,7 @@ func UnmuxAudios(ctx context.Context, info *ffprobe.Info, srcFile, dstDir string
 		audioIdx   = 0
 	)
 	for _, s := range audios {
-		var audioPath = filepath.Join(dstDir, fmt.Sprintf("audio_%d.%s", audioIdx, info.GetFileExt()))
+		var audioPath = filepath.Join(dstDir, fmt.Sprintf("orig_audio_%d.%s", audioIdx, info.GetFileExt()))
 		audioMap = append(
 			audioMap,
 			"-map", fmt.Sprintf("0:%d", s.Index),

@@ -30,7 +30,7 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 		if cleanFull {
 			_ = s.cleanFull(t, taskDir)
 		} else {
-			// @todo: clean only necessary files
+			_ = s.clean(t, taskDir)
 		}
 
 		if skipTask {
@@ -84,7 +84,7 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 		ctx,
 		sourceInfo,
 		sourcePath,
-		filepath.Join(taskDir, "videos"),
+		filepath.Join(taskDir, "video"),
 	); err != nil {
 		cleanFull = true
 		return t, errors.Unmux(err)
