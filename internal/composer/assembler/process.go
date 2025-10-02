@@ -50,7 +50,7 @@ func (a *Assembler) process(t task.Task) (task.Task, error) {
 		}()
 	}
 
-	_, _ = ctx, err
+	var progress = func(point int64) { _ = a.mod.task.UpdateProgress(ctx, t.ID, point) }
 
 	// find quality chunks, audios, poster
 	var (
@@ -86,6 +86,8 @@ func (a *Assembler) process(t task.Task) (task.Task, error) {
 		stitchedVideos[quality] = outFile
 	}
 
+	progress(task.ProgressAfterStitch)
+
 	// fragment videos, audios
 	var (
 		fragVideos = make(map[string]string, len(stitchedVideos))
@@ -106,6 +108,7 @@ func (a *Assembler) process(t task.Task) (task.Task, error) {
 
 		fragVideos[quality] = outFile
 	}
+	progress(task.ProgressAfterFragmentVideo)
 
 	for quality, file := range audios {
 		outFile, err := ffmpeg.Fragment(
@@ -121,6 +124,7 @@ func (a *Assembler) process(t task.Task) (task.Task, error) {
 
 		fragAudios[quality] = outFile
 	}
+	progress(task.ProgressAfterFragmentAudio)
 
 	// @todo:
 	// maybe encrypt videos, audios if needed???

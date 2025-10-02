@@ -71,4 +71,12 @@ const (
     WHERE task_id = $1
 		AND status != 'done'
     `
+
+	getTaskDurationQuery = `
+	SELECT 
+		duration
+	FROM transcoder.queue
+    WHERE task_id = $1
+        AND deleted_at IS NULL
+    `
 )

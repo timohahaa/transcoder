@@ -62,12 +62,15 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 		}()
 	}
 
+	var progress = func(point int64) { _ = s.mod.task.UpdateProgress(ctx, t.ID, point) }
+
 	// download source
 	var sourcePath string
 	if sourcePath, err = s.downloadSource(ctx, t, filepath.Join(taskDir, "source")); err != nil {
 		cleanFull = true
 		return t, err
 	}
+	progress(task.ProgressAfterDownloadSource)
 
 	var sourceInfo *ffprobe.Info
 	if sourceInfo, err = ffprobe.GetInfo(ctx, sourcePath); err != nil {
@@ -110,6 +113,8 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 		return t, errors.Unmux(err)
 	}
 
+	progress(task.ProgressAfterUnmux)
+
 	if err := preValidate(ctx, videoFile, audioFiles); err != nil {
 		cleanFull = true
 		return t, err
@@ -120,6 +125,8 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 		cleanFull = true
 		return t, err
 	}
+
+	progress(task.ProgressAfterSplit)
 
 	// presets
 	var chunkPresets map[string]analyze.ChunkPresets
@@ -153,6 +160,8 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 		skipTask = true
 		return t, err
 	}
+
+	progress(task.ProgressAfterCreateSubtasks)
 
 	// update db
 	if err := s.mod.task.UpdateStatus(ctx, t.ID, task.StatusEncoding, nil); err != nil {
