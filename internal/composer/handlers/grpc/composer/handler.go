@@ -15,6 +15,11 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+const (
+	skipTask = "SKIP_TASK"
+	noTasks  = "NO_TASKS"
+)
+
 type (
 	Handler struct {
 		pb.UnimplementedComposerServer
@@ -41,7 +46,20 @@ func New(conn *pgxpool.Pool, redis redis.UniversalClient) *Handler {
 }
 
 func (h *Handler) GetTask(ctx context.Context, req *pb.GetTaskRequest) (*pb.Task, error) {
-	return nil, nil
+	var t, err = h.mod.queue.GetSubtask(ctx, req)
+
+	if err != nil {
+		switch err {
+		case queue.ErrNoTasks:
+			return nil, status.Error(codes.Unavailable, noTasks)
+		case queue.ErrSkip:
+			return nil, status.Error(codes.NotFound, skipTask)
+		default:
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	return t, nil
 }
 func (h *Handler) FinishTask(ctx context.Context, req *pb.FinishTaskRequest) (*emptypb.Empty, error) {
 	return nil, nil
