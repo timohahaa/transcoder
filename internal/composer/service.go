@@ -111,7 +111,7 @@ func (srv *Service) Run() error {
 	})
 	splitter.Run(srv.cfg.Splitter.Workers, srv.cfg.Splitter.Watchers)
 
-	assembler := assembler.New(srv.conn, assembler.Config{
+	assembler := assembler.New(srv.conn, srv.redis, assembler.Config{
 		WorkDir: srv.cfg.WorkDir,
 	})
 	assembler.Run(srv.cfg.Assembler.Workers, srv.cfg.Assembler.Watchers)

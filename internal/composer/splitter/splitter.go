@@ -49,7 +49,7 @@ func New(
 		l:   log.WithFields(log.Fields{"mod": "splitter"}),
 		cfg: cfg,
 		mod: mod{
-			task:  task.New(conn),
+			task:  task.New(conn, redis),
 			queue: queue.New(redis),
 		},
 		tasks: make(chan task.Task),

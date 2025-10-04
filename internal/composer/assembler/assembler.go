@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/redis/go-redis/v9"
 	log "github.com/sirupsen/logrus"
 	"github.com/timohahaa/transcoder/internal/composer/modules/task"
 	"github.com/timohahaa/transcoder/pkg/errors"
@@ -38,13 +39,14 @@ type (
 
 func New(
 	conn *pgxpool.Pool,
+	redis redis.UniversalClient,
 	cfg Config,
 ) *Assembler {
 	return &Assembler{
 		l:   log.WithFields(log.Fields{"mod": "assembler"}),
 		cfg: cfg,
 		mod: mod{
-			task: task.New(conn),
+			task: task.New(conn, redis),
 		},
 		tasks: make(chan task.Task),
 
