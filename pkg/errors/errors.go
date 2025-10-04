@@ -54,6 +54,10 @@ func Assembler(err error) *pb.Error {
 	return New(codes.Generic, "assembler", extractMeta(err))
 }
 
+func Encoder(err error) *pb.Error {
+	return New(codes.Generic, "encoder", extractMeta(err))
+}
+
 func Network(err error) *pb.Error {
 	return New(codes.Network, "transcoder", extractMeta(err))
 }

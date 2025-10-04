@@ -44,7 +44,7 @@ func (c *Config) setDefaults() {
 		c.Assembler.Watchers = 1
 	}
 	if c.WorkDir == "" {
-		c.WorkDir = filepath.Join(os.TempDir(), "transcoder")
+		c.WorkDir = filepath.Join(os.TempDir(), "composer")
 	}
 	if c.HttpAddr == "" {
 		c.HttpAddr = ":8080"
