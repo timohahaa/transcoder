@@ -26,9 +26,11 @@ message Preset {
 }
 
 message AudioPreset {
-  int32 Channels   = 1;
-  int64 Bitrate    = 2;
-  int64 SampleRate = 3;
-  float PadBefore  = 4;
-  float PadAfter   = 5;
+  int32 Channels     = 1;
+  int64 Bitrate      = 2;
+  int64 SampleRate   = 3;
+  float PadBefore    = 4;
+  float PadAfter     = 5;
+  float TrimBefore   = 6;
+  float TrimDuration = 7;
 }

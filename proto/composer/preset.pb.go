@@ -208,6 +208,8 @@ type AudioPreset struct {
 	SampleRate    int64                  `protobuf:"varint,3,opt,name=SampleRate,proto3" json:"SampleRate,omitempty"`
 	PadBefore     float32                `protobuf:"fixed32,4,opt,name=PadBefore,proto3" json:"PadBefore,omitempty"`
 	PadAfter      float32                `protobuf:"fixed32,5,opt,name=PadAfter,proto3" json:"PadAfter,omitempty"`
+	TrimBefore    float32                `protobuf:"fixed32,6,opt,name=TrimBefore,proto3" json:"TrimBefore,omitempty"`
+	TrimDuration  float32                `protobuf:"fixed32,7,opt,name=TrimDuration,proto3" json:"TrimDuration,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -277,6 +279,20 @@ func (x *AudioPreset) GetPadAfter() float32 {
 	return 0
 }
 
+func (x *AudioPreset) GetTrimBefore() float32 {
+	if x != nil {
+		return x.TrimBefore
+	}
+	return 0
+}
+
+func (x *AudioPreset) GetTrimDuration() float32 {
+	if x != nil {
+		return x.TrimDuration
+	}
+	return 0
+}
+
 var File_proto_composer_preset_proto protoreflect.FileDescriptor
 
 const file_proto_composer_preset_proto_rawDesc = "" +
@@ -311,7 +327,7 @@ const file_proto_composer_preset_proto_rawDesc = "" +
 	"IsVertical\x18\x10 \x01(\bR\n" +
 	"IsVertical\x12\x14\n" +
 	"\x05Width\x18\x11 \x01(\x05R\x05Width\x12\x16\n" +
-	"\x06Height\x18\x12 \x01(\x05R\x06Height\"\x9d\x01\n" +
+	"\x06Height\x18\x12 \x01(\x05R\x06Height\"\xe1\x01\n" +
 	"\vAudioPreset\x12\x1a\n" +
 	"\bChannels\x18\x01 \x01(\x05R\bChannels\x12\x18\n" +
 	"\aBitrate\x18\x02 \x01(\x03R\aBitrate\x12\x1e\n" +
@@ -319,7 +335,11 @@ const file_proto_composer_preset_proto_rawDesc = "" +
 	"SampleRate\x18\x03 \x01(\x03R\n" +
 	"SampleRate\x12\x1c\n" +
 	"\tPadBefore\x18\x04 \x01(\x02R\tPadBefore\x12\x1a\n" +
-	"\bPadAfter\x18\x05 \x01(\x02R\bPadAfterB0Z.github.com/timohahaa/transcoder/proto/composerb\x06proto3"
+	"\bPadAfter\x18\x05 \x01(\x02R\bPadAfter\x12\x1e\n" +
+	"\n" +
+	"TrimBefore\x18\x06 \x01(\x02R\n" +
+	"TrimBefore\x12\"\n" +
+	"\fTrimDuration\x18\a \x01(\x02R\fTrimDurationB0Z.github.com/timohahaa/transcoder/proto/composerb\x06proto3"
 
 var (
 	file_proto_composer_preset_proto_rawDescOnce sync.Once

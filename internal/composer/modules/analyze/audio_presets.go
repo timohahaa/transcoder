@@ -15,11 +15,13 @@ type AudioPreset struct {
 }
 
 var baseAudioPreset = pb.AudioPreset{
-	Channels:   2,
-	Bitrate:    192 * consts.KBit,
-	SampleRate: 44000,
-	PadBefore:  0,
-	PadAfter:   0,
+	Channels:     2,
+	Bitrate:      192 * consts.KBit,
+	SampleRate:   44000,
+	PadBefore:    0,
+	PadAfter:     0,
+	TrimBefore:   0,
+	TrimDuration: 0,
 }
 
 func CalcAudioPresets(ctx context.Context, info *ffprobe.Info, files []string) (map[string]AudioPreset, error) {
