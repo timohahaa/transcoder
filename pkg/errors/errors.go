@@ -111,11 +111,11 @@ func Unmux(err error) *pb.Error {
 }
 
 func TaskReset() *pb.Error {
-	return New(codes.TaskResetByWorker, "worker", nil)
+	return New(codes.TaskResetByEncoder, "encoder", nil)
 }
 
 func GeneratePoster(err error) *pb.Error {
-	return New(codes.GeneratePoster, "worker", extractMeta(err))
+	return New(codes.GeneratePoster, "encoder", extractMeta(err))
 }
 
 func ChunkOverflow(need, actual int32) *pb.Error {

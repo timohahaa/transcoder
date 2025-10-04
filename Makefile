@@ -8,14 +8,14 @@ build-composer:
 	@file  .build/composer
 	@du -h .build/composer
 
-build-worker:
+build-encoder:
 	@[ -d .build ] || mkdir -p .build
-	@$(BUILD_ENVPARMS) go build -ldflags "$(LDFLAGS)" -o .build/worker cmd/worker/main.go
-	@file  .build/worker
-	@du -h .build/worker
+	@$(BUILD_ENVPARMS) go build -ldflags "$(LDFLAGS)" -o .build/encoder cmd/encoder/main.go
+	@file  .build/encoder
+	@du -h .build/encoder
 
 .PHONY: build
-build: build-composer build-worker
+build: build-composer build-encoder
 
 
 .PHONY: proto
@@ -35,10 +35,10 @@ run-composer:
 	GRPC_ADDR=localhost:9090 \
 	go run cmd/composer/main.go
 
-run-worker:
+run-encoder:
 	@DEBUG=true \
 	COMPOSER_ADDRS=localhost:9999 \
-	go run cmd/worker/main.go
+	go run cmd/encoder/main.go
 
 
 compose-up:

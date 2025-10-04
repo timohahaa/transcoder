@@ -1,4 +1,4 @@
-package worker
+package encoder
 
 type (
 	Config struct {
