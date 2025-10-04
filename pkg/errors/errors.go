@@ -1,6 +1,8 @@
 package errors
 
 import (
+	"strconv"
+
 	"github.com/timohahaa/transcoder/pkg/errors/codes"
 	"github.com/timohahaa/transcoder/pkg/ffmpeg"
 	pb "github.com/timohahaa/transcoder/proto/composer"
@@ -114,4 +116,11 @@ func TaskReset() *pb.Error {
 
 func GeneratePoster(err error) *pb.Error {
 	return New(codes.GeneratePoster, "worker", extractMeta(err))
+}
+
+func ChunkOverflow(need, actual int32) *pb.Error {
+	return New(codes.ChunkOverflow, "composer", map[string]string{
+		"need":   strconv.FormatInt(int64(need), 10),
+		"actual": strconv.FormatInt(int64(actual), 10),
+	})
 }

@@ -63,7 +63,11 @@ func (m *Module) AddSubtask(ctx context.Context, queueKey string, subtask *pb.Ta
 	return nil
 }
 
-func (m *Module) Skip(ctx context.Context, taskID uuid.UUID) error {
+func (m *Module) FinishSubtask(ctx context.Context, taskID uuid.UUID) (currCount int64, err error) {
+	return m.redis.Incr(ctx, key.Counter(taskID)).Result()
+}
+
+func (m *Module) SkipTask(ctx context.Context, taskID uuid.UUID) error {
 	var key = key.Skip(taskID)
 	if err := m.redis.Set(context.Background(), key, true, 24*time.Hour).Err(); err != nil {
 		return errors.Redis(err)

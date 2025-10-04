@@ -34,7 +34,7 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 		}
 
 		if skipTask {
-			_ = s.mod.queue.Skip(context.Background(), t.ID)
+			_ = s.mod.queue.SkipTask(context.Background(), t.ID)
 		}
 	}()
 

@@ -7,8 +7,8 @@ const (
 	ProgressAfterCreateSubtasks = 20
 
 	progressAfterSplitting = 20
-	progressAfterEncoding  = 80
-	encodingPercentRange   = progressAfterEncoding - progressAfterSplitting
+	ProgressAfterEncoding  = 80
+	encodingPercentRange   = ProgressAfterEncoding - progressAfterSplitting
 
 	ProgressAfterStitch        = 87
 	ProgressAfterFragmentVideo = 95
