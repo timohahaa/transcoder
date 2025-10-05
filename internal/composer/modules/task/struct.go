@@ -26,13 +26,13 @@ const (
 )
 
 type Task struct {
-	ID       uuid.UUID `db:"task_id"`
-	Source   Source    `db:"source"`
-	Encoder  string    `db:"encoder"`
-	Routing  string    `db:"routing"`
-	Duration float64   `db:"duration"`
-	FileSize int64     `db:"file_size"`
-	Settings Settings  `db:"settings"`
+	ID       uuid.UUID `db:"task_id"   json:"id"`
+	Source   Source    `db:"source"    json:"source"`
+	Encoder  string    `db:"encoder"   json:"-"`
+	Routing  string    `db:"routing"   json:"routing"`
+	Duration float64   `db:"duration"  json:"duration"`
+	FileSize int64     `db:"file_size" json:"file_size"`
+	Settings Settings  `db:"settings"  json:"settings"`
 }
 
 type Source struct {
@@ -82,4 +82,11 @@ func (s *Settings) Scan(value any) error {
 
 func (s Settings) Value() (driver.Value, error) {
 	return json.Marshal(s)
+}
+
+type CreateForm struct {
+	Source   Source   `db:"source"    json:"source"    validate:"dive"`
+	Duration float64  `db:"duration"  json:"duration"  validate:"gt=0"`
+	FileSize int64    `db:"file_size" json:"file_size" validate:"gt=0"`
+	Settings Settings `db:"settings"  json:"settings"`
 }
