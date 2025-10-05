@@ -48,7 +48,7 @@ func New(cfg Config) (*Service, error) {
 		Password: cfg.Redis.Password,
 	})
 	if err = s.redis.Ping(context.Background()).Err(); err != nil {
-		// return nil, err
+		return nil, err
 	}
 
 	if s.conn, err = pgxpool.New(context.Background(), cfg.PostgresDSN); err != nil {
@@ -56,7 +56,7 @@ func New(cfg Config) (*Service, error) {
 	}
 
 	if err = s.conn.Ping(context.Background()); err != nil {
-		// return nil, err
+		return nil, err
 	}
 
 	return s, nil

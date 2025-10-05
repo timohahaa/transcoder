@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS transcoder.queue (
     , settings        JSONB     NOT NULL DEFAULT '{}'
     , error           TEXT      NOT NULL DEFAULT ''
     , created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-    , updated_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    , updated_at      TIMESTAMP
+    , deleted_at      TIMESTAMP
 
     , CONSTRAINT transcoder_queue_check_status CHECK ( status IN (
             'pending'

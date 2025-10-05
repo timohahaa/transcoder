@@ -27,6 +27,26 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis: # act as hook for other 2 containers
+        condition: service_healthy
+
+  redis:
+    platform: linux/x86_64
+    container_name: redis
+    restart: unless-stopped
+    image: redis:8.2-alpine
+    env_file: .env
+    ports:
+      - '6379:6379'
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes: 
+      - redis_data:/data
+    healthcheck:
+      test: redis-cli -a ${REDIS_PASSWORD} ping
+      interval: 5s
+      timeout: 5s
+      retries: 3
 
 volumes:
   pg_data:
+  redis_data:

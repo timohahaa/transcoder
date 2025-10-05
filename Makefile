@@ -27,8 +27,8 @@ proto:
 
 run-composer:
 	@DEBUG=true \
-	REDIS_ADDRS=localhost:6767 \
-	REDIS_USERNAME=redis-user \
+	REDIS_ADDRS=localhost:6379 \
+	REDIS_USERNAME=default \
 	REDIS_PASSWORD=redis-pass \
 	POSTGRES_DSN=postgres://postgres:password@0.0.0.0:5432/main?sslmode=disable \
 	HTTP_ADDR=localhost:8080 \
@@ -37,7 +37,7 @@ run-composer:
 
 run-encoder:
 	@DEBUG=true \
-	COMPOSER_ADDRS=localhost:9999 \
+	COMPOSER_ADDRS=localhost:9090 \
 	go run cmd/encoder/main.go
 
 
