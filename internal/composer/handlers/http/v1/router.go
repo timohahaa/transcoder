@@ -13,6 +13,7 @@ func New(workDir string) *chi.Mux {
 	)
 
 	mux.Mount("/swagger", httpSwagger.Handler(
+		httpSwagger.DefaultModelsExpandDepth(httpSwagger.HideModel),
 		httpSwagger.UIConfig(map[string]string{
 			"supportedSubmitMethods": "[]",
 			//"supportedSubmitMethods": `["get", "head"]`,
