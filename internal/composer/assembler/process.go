@@ -126,7 +126,7 @@ func (a *Assembler) process(t task.Task) (task.Task, error) {
 	}
 	progress(task.ProgressAfterFragmentAudio)
 
-	// @todo:
+	//	@todo:
 	// maybe encrypt videos, audios if needed???
 	// generate manifests
 	// upload assets (where???)

@@ -79,4 +79,48 @@ const (
     WHERE task_id = $1
         AND deleted_at IS NULL
     `
+
+	createQuery = `
+	INSERT INTO transcoder.queue (
+		source
+		, duration
+		, file_size
+		, settings
+	) VALUES (
+		$1
+		, $2
+		, $3
+		, $4
+	) 
+	RETURNING
+		task_id
+		, source
+		, encoder
+		, routing
+        , duration
+        , file_size
+        , settings
+	`
+
+	getQuery = `
+	SELECT 
+		task_id
+		, source
+		, encoder
+		, routing
+        , duration
+        , file_size
+        , settings
+	FROM transcoder.queue
+	WHERE task_id = $1
+		AND deleted_at IS NULL
+	`
+
+	deleteQuery = `
+	UPDATE transcoder.queue
+	SET
+		deleted_at = CURRENT_TIMESTAMP
+	WHERE task_id = $1
+		AND deleted_at IS NULL
+	`
 )

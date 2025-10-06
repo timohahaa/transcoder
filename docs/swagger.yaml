@@ -1,0 +1,185 @@
+definitions:
+  github_com_timohahaa_transcoder_internal_composer_modules_task.CreateForm:
+    properties:
+      duration:
+        type: number
+      file_size:
+        type: integer
+      settings:
+        $ref: '#/definitions/github_com_timohahaa_transcoder_internal_composer_modules_task.Settings'
+      source:
+        $ref: '#/definitions/github_com_timohahaa_transcoder_internal_composer_modules_task.Source'
+    type: object
+  github_com_timohahaa_transcoder_internal_composer_modules_task.Settings:
+    properties:
+      encrypt:
+        type: boolean
+    type: object
+  github_com_timohahaa_transcoder_internal_composer_modules_task.Source:
+    properties:
+      fs:
+        $ref: '#/definitions/github_com_timohahaa_transcoder_internal_composer_modules_task.SourceFS'
+      http:
+        $ref: '#/definitions/github_com_timohahaa_transcoder_internal_composer_modules_task.SourceHTTP'
+    type: object
+  github_com_timohahaa_transcoder_internal_composer_modules_task.SourceFS:
+    properties:
+      path:
+        type: string
+    type: object
+  github_com_timohahaa_transcoder_internal_composer_modules_task.SourceHTTP:
+    properties:
+      url:
+        type: string
+    type: object
+  github_com_timohahaa_transcoder_internal_composer_modules_task.Task:
+    properties:
+      duration:
+        type: number
+      encoder:
+        type: string
+      file_size:
+        type: integer
+      id:
+        type: string
+      routing:
+        type: string
+      settings:
+        $ref: '#/definitions/github_com_timohahaa_transcoder_internal_composer_modules_task.Settings'
+      source:
+        $ref: '#/definitions/github_com_timohahaa_transcoder_internal_composer_modules_task.Source'
+    type: object
+  github_com_timohahaa_transcoder_internal_utils_render.HTTPError:
+    properties:
+      detail:
+        type: string
+      invalid_params:
+        items:
+          $ref: '#/definitions/validate.InvalidParamErr'
+        type: array
+      message:
+        type: string
+    type: object
+  render.HTTPError:
+    properties:
+      detail:
+        type: string
+      invalid_params:
+        items:
+          $ref: '#/definitions/validate.InvalidParamErr'
+        type: array
+      message:
+        type: string
+    type: object
+  tasks.taskProgress:
+    properties:
+      progress:
+        type: integer
+    type: object
+  validate.InvalidParamErr:
+    properties:
+      message:
+        type: string
+      param_name:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /v1/tasks/:
+    post:
+      parameters:
+      - description: Create Params
+        in: body
+        name: CreateParams
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_timohahaa_transcoder_internal_composer_modules_task.CreateForm'
+      responses:
+        "200":
+          description: Task Model
+          schema:
+            $ref: '#/definitions/github_com_timohahaa_transcoder_internal_composer_modules_task.Task'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/github_com_timohahaa_transcoder_internal_utils_render.HTTPError'
+      summary: Create task
+      tags:
+      - Tasks
+  /v1/tasks/{task_id}/:
+    delete:
+      parameters:
+      - description: Task ID
+        in: path
+        name: task_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Response
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/render.HTTPError'
+      summary: Delete task
+      tags:
+      - Tasks
+    get:
+      parameters:
+      - description: Task ID
+        in: path
+        name: task_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Task Model
+          schema:
+            $ref: '#/definitions/github_com_timohahaa_transcoder_internal_composer_modules_task.Task'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/render.HTTPError'
+      summary: Get task
+      tags:
+      - Tasks
+  /v1/tasks/{task_id}/cancel/:
+    post:
+      parameters:
+      - description: Task ID
+        in: path
+        name: task_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Response
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/render.HTTPError'
+      summary: Cancel task
+      tags:
+      - Tasks
+  /v1/tasks/{task_id}/progress/:
+    get:
+      parameters:
+      - description: Task ID
+        in: path
+        name: task_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Task progress
+          schema:
+            $ref: '#/definitions/tasks.taskProgress'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/render.HTTPError'
+      summary: Get task progress
+      tags:
+      - Tasks
+swagger: "2.0"

@@ -28,7 +28,7 @@ const (
 type Task struct {
 	ID       uuid.UUID `db:"task_id"   json:"id"`
 	Source   Source    `db:"source"    json:"source"`
-	Encoder  string    `db:"encoder"   json:"-"`
+	Encoder  string    `db:"encoder"   json:"encoder"`
 	Routing  string    `db:"routing"   json:"routing"`
 	Duration float64   `db:"duration"  json:"duration"`
 	FileSize int64     `db:"file_size" json:"file_size"`
@@ -85,7 +85,7 @@ func (s Settings) Value() (driver.Value, error) {
 }
 
 type CreateForm struct {
-	Source   Source   `db:"source"    json:"source"    validate:"dive"`
+	Source   Source   `db:"source"    json:"source"`
 	Duration float64  `db:"duration"  json:"duration"  validate:"gt=0"`
 	FileSize int64    `db:"file_size" json:"file_size" validate:"gt=0"`
 	Settings Settings `db:"settings"  json:"settings"`

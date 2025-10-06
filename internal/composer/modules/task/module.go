@@ -4,6 +4,7 @@ import (
 	"context"
 	stdErrors "errors"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -143,4 +144,56 @@ func (m *Module) UpdateEncodingProgress(ctx context.Context, taskID uuid.UUID, d
 
 func (m *Module) UpdateProgress(ctx context.Context, taskID uuid.UUID, point int64) error {
 	return m.redis.Set(ctx, key.Progress(taskID), point, 12*time.Hour).Err()
+}
+
+func (m *Module) GetProgress(ctx context.Context, taskID uuid.UUID) (int64, error) {
+	strVal, err := m.redis.Get(ctx, key.Progress(taskID)).Result()
+	if err != nil {
+		return 0, err
+	}
+	return strconv.ParseInt(strVal, 10, 64)
+}
+
+func (m *Module) Create(ctx context.Context, form CreateForm) (Task, error) {
+	var (
+		t   Task
+		err error
+	)
+	err = m.conn.QueryRow(ctx, createQuery,
+		form.Source,
+		form.Duration,
+		form.FileSize,
+		form.Settings,
+	).Scan(
+		&t.ID,
+		&t.Source,
+		&t.Encoder,
+		&t.Routing,
+		&t.Duration,
+		&t.FileSize,
+		&t.Settings,
+	)
+	return t, err
+}
+
+func (m *Module) Get(ctx context.Context, id uuid.UUID) (Task, error) {
+	var (
+		t   Task
+		err error
+	)
+	err = m.conn.QueryRow(ctx, getQuery, id).Scan(
+		&t.ID,
+		&t.Source,
+		&t.Encoder,
+		&t.Routing,
+		&t.Duration,
+		&t.FileSize,
+		&t.Settings,
+	)
+	return t, err
+}
+
+func (m *Module) Delete(ctx context.Context, id uuid.UUID) error {
+	_, err := m.conn.Exec(ctx, deleteQuery, id)
+	return err
 }

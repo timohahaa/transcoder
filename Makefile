@@ -53,3 +53,13 @@ compose-down:
 compose-shutdown:
 	docker compose down --volumes
 
+
+swag-init:
+	swag init -g cmd/composer/main.go \
+		--parseDependency \
+		--parseInternal \
+		--dir ./,./pkg,./internal/utils/ \
+
+swag-fmt:
+	swag fmt -g cmd/composer/main.go -d ./
+
