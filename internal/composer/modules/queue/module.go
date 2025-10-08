@@ -171,11 +171,10 @@ func taskFromRedisCmd(res *redis.StringSliceCmd) (*pb.Task, error) {
 }
 
 func routing(_ *pb.GetTaskRequest) string {
-	//	@todo:	can implement custom routing logic based on hostname/hardware/etc
+	//	@todo: can implement custom routing logic based on hostname/hardware/etc
 	return "transcoder:queue"
 }
 
-// @todo
 func (m *Module) create(routing string) (retErr error) {
 	var ctx = context.Background()
 
