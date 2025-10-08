@@ -50,7 +50,7 @@ func New(
 		cfg: cfg,
 		mod: mod{
 			task:  task.New(conn, redis),
-			queue: queue.New(redis),
+			queue: queue.New(conn, redis),
 		},
 		tasks: make(chan task.Task),
 

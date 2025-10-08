@@ -24,7 +24,7 @@ func New(conn *pgxpool.Pool, redis redis.UniversalClient) *chi.Mux {
 		h   = &handlers{
 			mod: mod{
 				task:  task.New(conn, redis),
-				queue: queue.New(redis),
+				queue: queue.New(conn, redis),
 			},
 		}
 	)

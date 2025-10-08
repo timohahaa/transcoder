@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 	log "github.com/sirupsen/logrus"
 	"github.com/timohahaa/transcoder/internal/composer/modules/task/key"
@@ -17,8 +19,17 @@ import (
 )
 
 const (
-	queueLen     = 10
-	taskTreshold = 20
+	queueLen       = 10
+	taskTreshold   = 20
+	advisoryLockID = 100_100
+
+	hour          = 3600
+	queueDurLimit = 5 * hour
+
+	gb                 = 1 << 30
+	queueFileSizeLimit = 150 * gb
+
+	queueCountLimit = 50
 )
 
 var (
@@ -27,11 +38,13 @@ var (
 )
 
 type Module struct {
+	conn  *pgxpool.Pool
 	redis redis.UniversalClient
 }
 
-func New(redis redis.UniversalClient) *Module {
+func New(conn *pgxpool.Pool, redis redis.UniversalClient) *Module {
 	return &Module{
+		conn:  conn,
 		redis: redis,
 	}
 }
@@ -87,7 +100,7 @@ func (m *Module) GetSubtask(ctx context.Context, req *pb.GetTaskRequest) (task *
 	}
 
 	if inQueue < taskTreshold {
-		if err := m.create(req, routing); err != nil {
+		if err := m.create(routing); err != nil {
 			log.WithFields(log.Fields{
 				"mod":     "queue",
 				"routing": routing,
@@ -163,6 +176,84 @@ func routing(_ *pb.GetTaskRequest) string {
 }
 
 // @todo
-func (m *Module) create(req *pb.GetTaskRequest, routing string) error {
+func (m *Module) create(routing string) (retErr error) {
+	var ctx = context.Background()
+
+	var tx, err = m.conn.Begin(ctx)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if retErr != nil {
+			_ = tx.Rollback(context.Background())
+		}
+	}()
+
+	// lock table
+	var locked bool
+	if err := tx.QueryRow(ctx, lockQuery, advisoryLockID).Scan(&locked); err != nil {
+		return err
+	}
+
+	if !locked {
+		return tx.Commit(ctx)
+	}
+
+	// check if queue already has enough tasks
+	var queueAlreadyCreated bool
+	if err := tx.QueryRow(ctx, checkTasksExistQuery,
+		routing,
+		queueDurLimit,
+		queueFileSizeLimit,
+		queueCountLimit,
+	).Scan(&queueAlreadyCreated); err != nil {
+		return err
+	}
+
+	if queueAlreadyCreated {
+		return tx.Commit(ctx)
+	}
+
+	// query tasks
+	rows, err := tx.Query(ctx, selectTasksQuery)
+	if err != nil {
+		return err
+	}
+
+	defer rows.Close()
+
+	taskIDs, err := pgx.CollectRows(rows, func(row pgx.CollectableRow) (uuid.UUID, error) {
+		var (
+			tID uuid.UUID
+			err = row.Scan(&tID)
+		)
+		return tID, err
+	})
+	if err != nil {
+		return err
+	}
+
+	if len(taskIDs) == 0 {
+		return tx.Commit(ctx)
+	}
+
+	// prep for splitting
+	prepName := "up_task" // can put in cfg or consts, or be lazy as me :)
+	upStmt, err := tx.Prepare(ctx, prepName, setWaitingSplittingQuery)
+	if err != nil {
+		return err
+	}
+
+	for _, tID := range taskIDs {
+		if _, err := tx.Exec(ctx, upStmt.Name, pgx.QueryExecModeCacheStatement, tID, routing); err != nil {
+			return err
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return err
+	}
+
 	return nil
 }

@@ -38,7 +38,7 @@ func New(conn *pgxpool.Pool, redis redis.UniversalClient) *Handler {
 	return &Handler{
 		mod: mod{
 			task:  task.New(conn, redis),
-			queue: queue.New(redis),
+			queue: queue.New(conn, redis),
 		},
 		l: log.WithFields(log.Fields{
 			"mod": "gRPC",

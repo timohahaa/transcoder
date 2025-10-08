@@ -5,7 +5,7 @@ const (
 	UPDATE transcoder.queue
 	SET
 		status     = 'splitting'
-        , hostname = $1
+		, hostname = $1
 		, updated_at = CURRENT_TIMESTAMP
 	WHERE task_id = (
 		SELECT
@@ -22,9 +22,9 @@ const (
 		, source
 		, encoder
 		, routing
-        , duration
-        , file_size
-        , settings
+		, duration
+		, file_size
+		, settings
 	`
 
 	getForAssemblingQuery = `
@@ -38,7 +38,7 @@ const (
 		FROM transcoder.queue
 		WHERE status = 'waiting-assembling'
 			AND deleted_at IS NULL
-            AND hostname = $1
+			AND hostname = $1
 		ORDER BY task_id
 		FOR UPDATE SKIP LOCKED
 		LIMIT 1
@@ -47,9 +47,9 @@ const (
 		, source
 		, encoder
 		, routing
-        , duration
-        , file_size
-        , settings
+		, duration
+		, file_size
+		, settings
 	`
 
 	checkCancellationQuery = `
@@ -63,12 +63,12 @@ const (
 	`
 
 	updateTaskStatusQuery = `
-    UPDATE transcoder.queue
-    SET
-        updated_at = CURRENT_TIMESTAMP
-        , status = $2
-        , error = $3
-    WHERE task_id = $1
+	UPDATE transcoder.queue
+	SET
+		updated_at = CURRENT_TIMESTAMP
+		, status = $2
+		, error = $3
+	WHERE task_id = $1
 		AND status != 'done'
     `
 
@@ -76,8 +76,8 @@ const (
 	SELECT 
 		duration
 	FROM transcoder.queue
-    WHERE task_id = $1
-        AND deleted_at IS NULL
+	WHERE task_id = $1
+		AND deleted_at IS NULL
     `
 
 	createQuery = `
@@ -97,9 +97,9 @@ const (
 		, source
 		, encoder
 		, routing
-        , duration
-        , file_size
-        , settings
+		, duration
+		, file_size
+		, settings
 	`
 
 	getQuery = `
@@ -108,9 +108,9 @@ const (
 		, source
 		, encoder
 		, routing
-        , duration
-        , file_size
-        , settings
+		, duration
+		, file_size
+		, settings
 	FROM transcoder.queue
 	WHERE task_id = $1
 		AND deleted_at IS NULL
