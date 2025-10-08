@@ -63,7 +63,7 @@ func (h *Handler) GetTask(ctx context.Context, req *pb.GetTaskRequest) (*pb.Task
 	return t, nil
 }
 
-func (h *Handler) UpdateProgress(ctx context.Context, req *pb.UpdateProgressReq) (*emptypb.Empty, error) {
+func (h *Handler) UpdateProgress(ctx context.Context, req *pb.UpdateProgressRequest) (*emptypb.Empty, error) {
 	var (
 		taskID, err = uuid.FromBytes(req.ID)
 		lg          = h.l.WithFields(log.Fields{

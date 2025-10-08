@@ -8,7 +8,6 @@ package composer
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -32,7 +31,7 @@ const (
 type ComposerClient interface {
 	GetTask(ctx context.Context, in *GetTaskRequest, opts ...grpc.CallOption) (*Task, error)
 	FinishTask(ctx context.Context, in *FinishTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	UpdateProgress(ctx context.Context, in *UpdateProgressReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateProgress(ctx context.Context, in *UpdateProgressRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type composerClient struct {
@@ -63,7 +62,7 @@ func (c *composerClient) FinishTask(ctx context.Context, in *FinishTaskRequest, 
 	return out, nil
 }
 
-func (c *composerClient) UpdateProgress(ctx context.Context, in *UpdateProgressReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *composerClient) UpdateProgress(ctx context.Context, in *UpdateProgressRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, Composer_UpdateProgress_FullMethodName, in, out, cOpts...)
@@ -79,7 +78,7 @@ func (c *composerClient) UpdateProgress(ctx context.Context, in *UpdateProgressR
 type ComposerServer interface {
 	GetTask(context.Context, *GetTaskRequest) (*Task, error)
 	FinishTask(context.Context, *FinishTaskRequest) (*emptypb.Empty, error)
-	UpdateProgress(context.Context, *UpdateProgressReq) (*emptypb.Empty, error)
+	UpdateProgress(context.Context, *UpdateProgressRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedComposerServer()
 }
 
@@ -96,7 +95,7 @@ func (UnimplementedComposerServer) GetTask(context.Context, *GetTaskRequest) (*T
 func (UnimplementedComposerServer) FinishTask(context.Context, *FinishTaskRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FinishTask not implemented")
 }
-func (UnimplementedComposerServer) UpdateProgress(context.Context, *UpdateProgressReq) (*emptypb.Empty, error) {
+func (UnimplementedComposerServer) UpdateProgress(context.Context, *UpdateProgressRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateProgress not implemented")
 }
 func (UnimplementedComposerServer) mustEmbedUnimplementedComposerServer() {}
@@ -157,7 +156,7 @@ func _Composer_FinishTask_Handler(srv interface{}, ctx context.Context, dec func
 }
 
 func _Composer_UpdateProgress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateProgressReq)
+	in := new(UpdateProgressRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -169,7 +168,7 @@ func _Composer_UpdateProgress_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: Composer_UpdateProgress_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ComposerServer).UpdateProgress(ctx, req.(*UpdateProgressReq))
+		return srv.(ComposerServer).UpdateProgress(ctx, req.(*UpdateProgressRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

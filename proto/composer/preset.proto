@@ -5,24 +5,24 @@ option go_package = "github.com/timohahaa/transcoder/proto/composer";
 package composer;
 
 message Preset {
-    string Quality        = 1; // 360, 720, 1440, etc...
-    int64  MaxBitRate     = 2;
-    int64  MinBitRate     = 3;
-    string FPS            = 4;
-    string Codec          = 5;
-    int64  Bufsize        = 6;
-    int32  GOPSeconds     = 7;
-    string Profile        = 8;
-    string Level          = 9;
-    int32  CRF            = 10; // -cq for GPU and -crf for CPU
-    string ColorTrc       = 11;
-    string ColorSpace     = 12;
-    string ColorPrimaries = 13;
-    string Tune           = 14; // psnr/ssim/grain/zerolatency/animation/film - content type
-    string Transpose      = 15; // clock/cclock/flip
-    bool   IsVertical     = 16;
-    int32  Width          = 17;
-    int32  Height         = 18;
+  string Quality        = 1; // 360, 720, 1440, etc...
+  int64  MaxBitRate     = 2;
+  int64  MinBitRate     = 3;
+  string FPS            = 4;
+  string Codec          = 5;
+  int64  Bufsize        = 6;
+  int32  GOPSeconds     = 7;
+  string Profile        = 8;
+  string Level          = 9;
+  int32  CRF            = 10; // -cq for GPU and -crf for CPU
+  string ColorTrc       = 11;
+  string ColorSpace     = 12;
+  string ColorPrimaries = 13;
+  string Tune           = 14; // psnr/ssim/grain/zerolatency/animation/film - content type
+  string Transpose      = 15; // clock/cclock/flip
+  bool   IsVertical     = 16;
+  int32  Width          = 17;
+  int32  Height         = 18;
 }
 
 message AudioPreset {

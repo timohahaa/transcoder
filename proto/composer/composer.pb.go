@@ -7,15 +7,14 @@
 package composer
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -145,7 +144,7 @@ func (x *FinishTaskRequest) GetFinishedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-type UpdateProgressReq struct {
+type UpdateProgressRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ID            []byte                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`       // taskID
 	Delta         *durationpb.Duration   `protobuf:"bytes,2,opt,name=Delta,proto3" json:"Delta,omitempty"` // how much was encoded
@@ -153,20 +152,20 @@ type UpdateProgressReq struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UpdateProgressReq) Reset() {
-	*x = UpdateProgressReq{}
+func (x *UpdateProgressRequest) Reset() {
+	*x = UpdateProgressRequest{}
 	mi := &file_proto_composer_composer_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UpdateProgressReq) String() string {
+func (x *UpdateProgressRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UpdateProgressReq) ProtoMessage() {}
+func (*UpdateProgressRequest) ProtoMessage() {}
 
-func (x *UpdateProgressReq) ProtoReflect() protoreflect.Message {
+func (x *UpdateProgressRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_composer_composer_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -178,19 +177,19 @@ func (x *UpdateProgressReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateProgressReq.ProtoReflect.Descriptor instead.
-func (*UpdateProgressReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use UpdateProgressRequest.ProtoReflect.Descriptor instead.
+func (*UpdateProgressRequest) Descriptor() ([]byte, []int) {
 	return file_proto_composer_composer_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *UpdateProgressReq) GetID() []byte {
+func (x *UpdateProgressRequest) GetID() []byte {
 	if x != nil {
 		return x.ID
 	}
 	return nil
 }
 
-func (x *UpdateProgressReq) GetDelta() *durationpb.Duration {
+func (x *UpdateProgressRequest) GetDelta() *durationpb.Duration {
 	if x != nil {
 		return x.Delta
 	}
@@ -272,8 +271,8 @@ const file_proto_composer_composer_proto_rawDesc = "" +
 	"\x05Error\x18\x02 \x01(\v2\x0f.composer.ErrorR\x05Error\x12:\n" +
 	"\n" +
 	"FinishedAt\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
-	"FinishedAt\"T\n" +
-	"\x11UpdateProgressReq\x12\x0e\n" +
+	"FinishedAt\"X\n" +
+	"\x15UpdateProgressRequest\x12\x0e\n" +
 	"\x02ID\x18\x01 \x01(\fR\x02ID\x12/\n" +
 	"\x05Delta\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\x05Delta\"\xaf\x01\n" +
 	"\x05Error\x12\x16\n" +
@@ -282,12 +281,12 @@ const file_proto_composer_composer_proto_rawDesc = "" +
 	"\bmetadata\x18\x03 \x03(\v2\x1d.composer.Error.MetadataEntryR\bmetadata\x1a;\n" +
 	"\rMetadataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x012\xc9\x01\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x012\xcd\x01\n" +
 	"\bComposer\x123\n" +
 	"\aGetTask\x12\x18.composer.GetTaskRequest\x1a\x0e.composer.Task\x12A\n" +
 	"\n" +
-	"FinishTask\x12\x1b.composer.FinishTaskRequest\x1a\x16.google.protobuf.Empty\x12E\n" +
-	"\x0eUpdateProgress\x12\x1b.composer.UpdateProgressReq\x1a\x16.google.protobuf.EmptyB0Z.github.com/timohahaa/transcoder/proto/composerb\x06proto3"
+	"FinishTask\x12\x1b.composer.FinishTaskRequest\x1a\x16.google.protobuf.Empty\x12I\n" +
+	"\x0eUpdateProgress\x12\x1f.composer.UpdateProgressRequest\x1a\x16.google.protobuf.EmptyB0Z.github.com/timohahaa/transcoder/proto/composerb\x06proto3"
 
 var (
 	file_proto_composer_composer_proto_rawDescOnce sync.Once
@@ -305,7 +304,7 @@ var file_proto_composer_composer_proto_msgTypes = make([]protoimpl.MessageInfo, 
 var file_proto_composer_composer_proto_goTypes = []any{
 	(*GetTaskRequest)(nil),        // 0: composer.GetTaskRequest
 	(*FinishTaskRequest)(nil),     // 1: composer.FinishTaskRequest
-	(*UpdateProgressReq)(nil),     // 2: composer.UpdateProgressReq
+	(*UpdateProgressRequest)(nil), // 2: composer.UpdateProgressRequest
 	(*Error)(nil),                 // 3: composer.Error
 	nil,                           // 4: composer.Error.MetadataEntry
 	(*Task)(nil),                  // 5: composer.Task
@@ -317,11 +316,11 @@ var file_proto_composer_composer_proto_depIdxs = []int32{
 	5, // 0: composer.FinishTaskRequest.Task:type_name -> composer.Task
 	3, // 1: composer.FinishTaskRequest.Error:type_name -> composer.Error
 	6, // 2: composer.FinishTaskRequest.FinishedAt:type_name -> google.protobuf.Timestamp
-	7, // 3: composer.UpdateProgressReq.Delta:type_name -> google.protobuf.Duration
+	7, // 3: composer.UpdateProgressRequest.Delta:type_name -> google.protobuf.Duration
 	4, // 4: composer.Error.metadata:type_name -> composer.Error.MetadataEntry
 	0, // 5: composer.Composer.GetTask:input_type -> composer.GetTaskRequest
 	1, // 6: composer.Composer.FinishTask:input_type -> composer.FinishTaskRequest
-	2, // 7: composer.Composer.UpdateProgress:input_type -> composer.UpdateProgressReq
+	2, // 7: composer.Composer.UpdateProgress:input_type -> composer.UpdateProgressRequest
 	5, // 8: composer.Composer.GetTask:output_type -> composer.Task
 	8, // 9: composer.Composer.FinishTask:output_type -> google.protobuf.Empty
 	8, // 10: composer.Composer.UpdateProgress:output_type -> google.protobuf.Empty

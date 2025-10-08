@@ -10,9 +10,9 @@ option go_package = "github.com/timohahaa/transcoder/proto/composer";
 package composer;
 
 service Composer {
-  rpc GetTask(GetTaskRequest)           returns (Task);
-  rpc FinishTask(FinishTaskRequest)     returns (google.protobuf.Empty);
-  rpc UpdateProgress(UpdateProgressReq) returns (google.protobuf.Empty);
+  rpc GetTask(GetTaskRequest)               returns (Task);
+  rpc FinishTask(FinishTaskRequest)         returns (google.protobuf.Empty);
+  rpc UpdateProgress(UpdateProgressRequest) returns (google.protobuf.Empty);
 }
 
 message GetTaskRequest {
@@ -27,7 +27,7 @@ message FinishTaskRequest {
   google.protobuf.Timestamp FinishedAt = 3;
 }
 
-message UpdateProgressReq {
+message UpdateProgressRequest {
   bytes                     ID         = 1; // taskID
   google.protobuf.Duration  Delta      = 2; // how much was encoded
 }

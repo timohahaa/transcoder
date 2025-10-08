@@ -88,7 +88,7 @@ func (w *Worker) getProgressCallback(task *pb.Task, taskID uuid.UUID) ffmpeg.Pro
 
 	return func(progress ffmpeg.Progress) {
 		if time.Since(prevSentTime).Seconds() >= 2 {
-			if err := w.composer.UpdateProgress(context.Background(), &pb.UpdateProgressReq{
+			if err := w.composer.UpdateProgress(context.Background(), &pb.UpdateProgressRequest{
 				ID:    task.ID,
 				Delta: durationpb.New(progress.Time.Sub(prevProgress.Time)),
 			}); err != nil {

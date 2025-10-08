@@ -18,10 +18,10 @@ const (
 )
 
 type (
-	Task              = pb.Task
-	GetTaskRequest    = pb.GetTaskRequest
-	FinishTaskRequest = pb.FinishTaskRequest
-	UpdateProgressReq = pb.UpdateProgressReq
+	Task                  = pb.Task
+	GetTaskRequest        = pb.GetTaskRequest
+	FinishTaskRequest     = pb.FinishTaskRequest
+	UpdateProgressRequest = pb.UpdateProgressRequest
 )
 
 func NewClient(addrs []string) (*Client, error) {
@@ -68,7 +68,7 @@ func (c *Client) FinishTask(ctx context.Context, req *FinishTaskRequest) error {
 	return err
 }
 
-func (c *Client) UpdateProgress(ctx context.Context, req *UpdateProgressReq) error {
+func (c *Client) UpdateProgress(ctx context.Context, req *UpdateProgressRequest) error {
 	_, err := c.client.UpdateProgress(ctx, req)
 	return err
 }
