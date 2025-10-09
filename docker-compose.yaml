@@ -22,12 +22,12 @@ services:
     restart: "no"
     build:
       context: .
-      dockerfile: ./sql-migrate.Dockerfile
+      dockerfile: deploy/sql-migrate.Dockerfile
     env_file: .env
     depends_on:
       postgres:
         condition: service_healthy
-      redis: # act as hook for other 2 containers
+      redis:
         condition: service_healthy
 
   redis:
@@ -47,6 +47,33 @@ services:
       timeout: 5s
       retries: 3
 
+  composer:
+    container_name: composer
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: deploy/composer.Dockerfile
+    env_file: .env
+    ports:
+      - ${HTTP_PORT}:${HTTP_PORT}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+
+  encoder:
+    container_name: encoder
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: deploy/encoder.Dockerfile
+    env_file: .env
+    depends_on:
+      composer:
+        condition: service_started
 volumes:
   pg_data:
   redis_data:

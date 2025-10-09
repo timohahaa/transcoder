@@ -1,18 +1,21 @@
-#BUILD_ENVPARMS:=GOOS=linux GOARCH=amd64 CGO_ENABLED=0
-BUILD_ENVPARMS:=GOOS=darwin GOARCH=arm64 CGO_ENABLED=0
+PLATFORM:=$(shell uname)
+
+ifeq ($(PLATFORM), Darwin)
+	BUILD_ENVPARMS:=GOOS=darwin GOARCH=arm64 CGO_ENABLED=0
+endif
+ifeq ($(PLATFORM), Linux)
+	BUILD_ENVPARMS:=GOOS=linux GOARCH=amd64 CGO_ENABLED=0
+endif
+
 LDFLAGS:=-s -w
 
 build-composer:
 	@[ -d .build ] || mkdir -p .build
 	@$(BUILD_ENVPARMS) go build -ldflags "$(LDFLAGS)" -o .build/composer cmd/composer/main.go
-	@file  .build/composer
-	@du -h .build/composer
 
 build-encoder:
 	@[ -d .build ] || mkdir -p .build
 	@$(BUILD_ENVPARMS) go build -ldflags "$(LDFLAGS)" -o .build/encoder cmd/encoder/main.go
-	@file  .build/encoder
-	@du -h .build/encoder
 
 .PHONY: build
 build: build-composer build-encoder
