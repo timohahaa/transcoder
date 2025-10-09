@@ -152,6 +152,8 @@ func (m *Module) next(ctx context.Context, routing string) (t *pb.Task, total in
 		return
 	}
 
+	fmt.Println("err", err)
+
 	return nil, 0, ErrNoTasks
 }
 
@@ -177,7 +179,11 @@ func routing(_ *pb.GetTaskRequest) string {
 }
 
 func (m *Module) create(routing string) (retErr error) {
-	var ctx = context.Background()
+	var (
+		ctx = context.Background()
+		idx = int(time.Now().UnixMilli() % int64(queueLen))
+	)
+	routing = routing + ":" + strconv.Itoa(idx)
 
 	var tx, err = m.conn.Begin(ctx)
 	if err != nil {
