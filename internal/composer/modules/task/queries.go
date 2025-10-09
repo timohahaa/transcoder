@@ -95,22 +95,26 @@ const (
 	RETURNING
 		task_id
 		, source
+		, status
 		, encoder
 		, routing
 		, duration
 		, file_size
 		, settings
+		, error
 	`
 
 	getQuery = `
 	SELECT 
 		task_id
 		, source
+		, status
 		, encoder
 		, routing
 		, duration
 		, file_size
 		, settings
+		, error
 	FROM transcoder.queue
 	WHERE task_id = $1
 		AND deleted_at IS NULL

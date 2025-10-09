@@ -48,17 +48,13 @@ definitions:
         $ref: '#/definitions/github_com_timohahaa_transcoder_internal_composer_modules_task.Settings'
       source:
         $ref: '#/definitions/github_com_timohahaa_transcoder_internal_composer_modules_task.Source'
+      status:
+        type: string
     type: object
-  github_com_timohahaa_transcoder_internal_utils_render.HTTPError:
+  internal_composer_handlers_http_v1_tasks.taskProgress:
     properties:
-      detail:
-        type: string
-      invalid_params:
-        items:
-          $ref: '#/definitions/validate.InvalidParamErr'
-        type: array
-      message:
-        type: string
+      progress:
+        type: integer
     type: object
   render.HTTPError:
     properties:
@@ -70,11 +66,6 @@ definitions:
         type: array
       message:
         type: string
-    type: object
-  tasks.taskProgress:
-    properties:
-      progress:
-        type: integer
     type: object
   validate.InvalidParamErr:
     properties:
@@ -103,7 +94,7 @@ paths:
         default:
           description: Error
           schema:
-            $ref: '#/definitions/github_com_timohahaa_transcoder_internal_utils_render.HTTPError'
+            $ref: '#/definitions/render.HTTPError'
       summary: Create task
       tags:
       - Tasks
@@ -174,7 +165,7 @@ paths:
         "200":
           description: Task progress
           schema:
-            $ref: '#/definitions/tasks.taskProgress'
+            $ref: '#/definitions/internal_composer_handlers_http_v1_tasks.taskProgress'
         default:
           description: Error
           schema:

@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"runtime"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -31,6 +33,9 @@ func init() {
 			TimestampFormat:  time.DateTime,
 			CallerPrettyfier: callerPrettyfier,
 		})
+	}
+	if debug, _ := strconv.ParseBool(os.Getenv("DEBUG")); debug {
+		log.SetLevel(log.DebugLevel)
 	}
 }
 

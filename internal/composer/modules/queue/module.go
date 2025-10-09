@@ -95,9 +95,6 @@ func (m *Module) GetSubtask(ctx context.Context, req *pb.GetTaskRequest) (task *
 	)
 
 	task, inQueue, err = m.next(ctx, routing)
-	if err != nil {
-		return
-	}
 
 	if inQueue < taskTreshold {
 		if err := m.create(routing); err != nil {
@@ -106,6 +103,10 @@ func (m *Module) GetSubtask(ctx context.Context, req *pb.GetTaskRequest) (task *
 				"routing": routing,
 			}).Errorf("create queue: %s", err)
 		}
+	}
+
+	if err != nil {
+		return
 	}
 
 	if m.redis.Exists(ctx, key.Skip(uuid.UUID(task.ID))).Val() == 1 {

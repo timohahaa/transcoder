@@ -149,6 +149,9 @@ func (m *Module) UpdateProgress(ctx context.Context, taskID uuid.UUID, point int
 func (m *Module) GetProgress(ctx context.Context, taskID uuid.UUID) (int64, error) {
 	strVal, err := m.redis.Get(ctx, key.Progress(taskID)).Result()
 	if err != nil {
+		if err == redis.Nil {
+			return 0, nil
+		}
 		return 0, err
 	}
 	return strconv.ParseInt(strVal, 10, 64)
@@ -167,11 +170,13 @@ func (m *Module) Create(ctx context.Context, form CreateForm) (Task, error) {
 	).Scan(
 		&t.ID,
 		&t.Source,
+		&t.Status,
 		&t.Encoder,
 		&t.Routing,
 		&t.Duration,
 		&t.FileSize,
 		&t.Settings,
+		&t.Error,
 	)
 	return t, err
 }
@@ -184,11 +189,13 @@ func (m *Module) Get(ctx context.Context, id uuid.UUID) (Task, error) {
 	err = m.conn.QueryRow(ctx, getQuery, id).Scan(
 		&t.ID,
 		&t.Source,
+		&t.Status,
 		&t.Encoder,
 		&t.Routing,
 		&t.Duration,
 		&t.FileSize,
 		&t.Settings,
+		&t.Error,
 	)
 	return t, err
 }

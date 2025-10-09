@@ -32,9 +32,9 @@ func New(conn *pgxpool.Pool, redis redis.UniversalClient) *chi.Mux {
 	mux.Post("/", h.create)
 	mux.Route("/{task_id}", func(mux chi.Router) {
 		mux.Get("/", h.get)
-		mux.Post("/", h.delete)
+		mux.Delete("/", h.delete)
 		mux.Post("/cancel", h.cancel)
-		mux.Post("/progress", h.progress)
+		mux.Get("/progress", h.progress)
 	})
 
 	return mux

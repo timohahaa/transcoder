@@ -86,6 +86,20 @@ func (e *Error) Value() (driver.Value, error) {
 	return json.Marshal(e)
 }
 
+func (e *Error) Scan(value any) error {
+	var source []byte
+	switch v := value.(type) {
+	case []byte:
+		source = v
+	case string:
+		source = []byte(v)
+	}
+	if len(source) == 0 {
+		return nil
+	}
+	return json.Unmarshal(source, &e)
+}
+
 func (ap *AudioPreset) Copy() *AudioPreset {
 	if ap == nil {
 		return nil

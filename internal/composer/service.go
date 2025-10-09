@@ -73,7 +73,11 @@ func (srv *Service) Run() error {
 		}
 	)
 
-	mux.Mount("/v1", v1.New(srv.cfg.WorkDir))
+	mux.Mount("/v1", v1.New(
+		srv.conn,
+		srv.redis,
+		srv.cfg.WorkDir,
+	))
 
 	log.Infof("HTTP server listening on: %s", srv.cfg.HttpAddr)
 	go func() {

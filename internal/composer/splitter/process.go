@@ -108,7 +108,7 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 		sourceInfo,
 		sourcePath,
 		filepath.Join(taskDir, "audios"),
-	); err != nil {
+	); err != nil && err != ffmpeg.ErrNoAudios {
 		cleanFull = true
 		return t, errors.Unmux(err)
 	}

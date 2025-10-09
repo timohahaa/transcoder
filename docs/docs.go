@@ -42,7 +42,7 @@ const docTemplate = `{
                     "default": {
                         "description": "Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_timohahaa_transcoder_internal_utils_render.HTTPError"
+                            "$ref": "#/definitions/render.HTTPError"
                         }
                     }
                 }
@@ -152,7 +152,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Task progress",
                         "schema": {
-                            "$ref": "#/definitions/tasks.taskProgress"
+                            "$ref": "#/definitions/internal_composer_handlers_http_v1_tasks.taskProgress"
                         }
                     },
                     "default": {
@@ -241,23 +241,17 @@ const docTemplate = `{
                 },
                 "source": {
                     "$ref": "#/definitions/github_com_timohahaa_transcoder_internal_composer_modules_task.Source"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
-        "github_com_timohahaa_transcoder_internal_utils_render.HTTPError": {
+        "internal_composer_handlers_http_v1_tasks.taskProgress": {
             "type": "object",
             "properties": {
-                "detail": {
-                    "type": "string"
-                },
-                "invalid_params": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/validate.InvalidParamErr"
-                    }
-                },
-                "message": {
-                    "type": "string"
+                "progress": {
+                    "type": "integer"
                 }
             }
         },
@@ -275,14 +269,6 @@ const docTemplate = `{
                 },
                 "message": {
                     "type": "string"
-                }
-            }
-        },
-        "tasks.taskProgress": {
-            "type": "object",
-            "properties": {
-                "progress": {
-                    "type": "integer"
                 }
             }
         },

@@ -9,9 +9,9 @@ import (
 type (
 	Config struct {
 		ComposerAddrs     []string `arg:"required,-,--,env:COMPOSER_ADDRS"`
-		CPUQuota          int      `arg:"required,-,--,env:CPU_QUOTA`
+		CPUQuota          int      `arg:"-,--,env:CPU_QUOTA"`
 		WorkDir           string   `arg:"-,--,env:WORK_DIR"`
-		MaxTasksPerWorker int      `arg:"-,--,env:MAX_TASKS_PER_WORKER`
+		MaxTasksPerWorker int      `arg:"-,--,env:MAX_TASKS_PER_WORKER"`
 	}
 )
 
