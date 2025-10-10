@@ -86,7 +86,7 @@ func Ffmpeg(err error) *pb.Error {
 		}
 	}
 
-	return New(codes.Network, "ffmpeg", map[string]string{
+	return New(codes.Ffmpeg, "ffmpeg", map[string]string{
 		"timestamp": ffmpegErr.GetTimestamp(),
 		"code":      ffmpegErr.Code,
 		"path":      ffmpegErr.Path,

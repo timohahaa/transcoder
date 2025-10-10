@@ -152,8 +152,6 @@ func (m *Module) next(ctx context.Context, routing string) (t *pb.Task, total in
 		return
 	}
 
-	fmt.Println("err", err)
-
 	return nil, 0, ErrNoTasks
 }
 

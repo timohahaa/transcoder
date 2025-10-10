@@ -2,7 +2,6 @@ package splitter
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"time"
 
@@ -109,7 +108,6 @@ func (s *Splitter) worker(idx int) {
 			if !ok {
 				continue
 			}
-			fmt.Println(task)
 			st := time.Now()
 			t, err := s.process(task)
 			s.finishTask(t, err, time.Since(st))

@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/google/uuid"
+	log "github.com/sirupsen/logrus"
 	"github.com/timohahaa/transcoder/pkg/errors"
 	"github.com/timohahaa/transcoder/pkg/request"
 	pb "github.com/timohahaa/transcoder/proto/composer"
@@ -17,6 +18,13 @@ const (
 )
 
 func (srv *Service) prefetch(task *pb.Task, taskID uuid.UUID) (path string, retErr error) {
+	var (
+		l = log.WithFields(log.Fields{
+			"mod":     "prefetch",
+			"task_id": taskID,
+		})
+	)
+
 	var srcFolder = filepath.Join(
 		srv.cfg.WorkDir,
 		taskID.String(),
@@ -45,6 +53,8 @@ func (srv *Service) prefetch(task *pb.Task, taskID uuid.UUID) (path string, retE
 	if err := os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil {
 		return "", errors.Encoder(err)
 	}
+
+	l.Debugf("download from: %v", task.Source)
 	if err := request.Download(context.Background(), task.Source, path, retryAttempts); err != nil {
 		return "", err
 	}
