@@ -17,7 +17,7 @@ type AudioPreset struct {
 var baseAudioPreset = pb.AudioPreset{
 	Channels:     2,
 	Bitrate:      192 * consts.KBit,
-	SampleRate:   44000,
+	SampleRate:   44100,
 	PadBefore:    0,
 	PadAfter:     0,
 	TrimBefore:   0,
@@ -41,13 +41,29 @@ func CalcAudioPresets(ctx context.Context, info *ffprobe.Info, files []string) (
 		if streams := aInfo.GetAllAudios(); len(streams) > 0 {
 			aStream := streams[0]
 
-			startTime, err := strconv.ParseFloat(aStream.StartTime, 64)
-			if err == nil {
+			if sampleRate, err := strconv.ParseInt(aStream.SampleRate, 10, 64); err == nil {
+				preset.SampleRate = sampleRate
+			}
+
+			if aInfo.Format.BitRate != 0 {
+				preset.Bitrate = min(preset.Bitrate, aInfo.Format.BitRate)
+			} else if aStream.BitRate != 0 {
+				preset.Bitrate = min(preset.Bitrate, aStream.BitRate)
+			}
+
+			startTime, _ := strconv.ParseFloat(aStream.StartTime, 64)
+
+			if startTime < 0 {
+				preset.TrimBefore = -1 * float32(startTime)
+			} else {
 				preset.PadBefore = float32(startTime)
 			}
 
-			if startTime+aInfo.GetDuration() < videoDur {
-				preset.PadAfter = float32(videoDur - aInfo.GetDuration() - startTime)
+			switch dur := startTime + aInfo.GetDuration(); {
+			case dur < videoDur:
+				preset.PadAfter = float32(videoDur - dur)
+			case dur > videoDur:
+				preset.TrimDuration = float32(videoDur)
 			}
 		}
 
