@@ -93,16 +93,6 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 		return t, errors.Unmux(err)
 	}
 
-	// Need to update ffprobe info after unmux.
-	// Cause for some containers like mkv there is no stream duration in ffprobe,
-	// It means that video and audio files can have different duration
-	// only format duration.
-	// and we wont know it unless we unmux the file
-	if sourceInfo, err = ffprobe.GetInfo(ctx, videoFile); err != nil {
-		cleanFull = true
-		return t, errors.Splitter(err)
-	}
-
 	if audioFiles, err = ffmpeg.UnmuxAudios(
 		ctx,
 		sourceInfo,
@@ -114,6 +104,16 @@ func (s *Splitter) process(t task.Task) (task.Task, error) {
 	}
 
 	progress(task.ProgressAfterUnmux)
+
+	// Need to update ffprobe info after unmux.
+	// Cause for some containers like mkv there is no stream duration in ffprobe,
+	// It means that video and audio files can have different duration
+	// only format duration.
+	// and we wont know it unless we unmux the file
+	if sourceInfo, err = ffprobe.GetInfo(ctx, videoFile); err != nil {
+		cleanFull = true
+		return t, errors.Splitter(err)
+	}
 
 	if err := preValidate(ctx, videoFile, audioFiles); err != nil {
 		cleanFull = true
