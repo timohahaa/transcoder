@@ -77,7 +77,8 @@ func (a *Assembler) process(t task.Task) (task.Task, error) {
 		outFile, err := ffmpeg.Stitch(
 			ctx,
 			chunks,
-			assetsDir, fmt.Sprintf("%v_stitched.mp4", quality),
+			assetsDir,
+			fmt.Sprintf("%v_stitched.mp4", quality),
 		)
 		if err != nil {
 			return t, errors.StitchSources(err)

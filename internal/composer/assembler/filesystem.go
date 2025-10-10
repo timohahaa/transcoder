@@ -34,8 +34,20 @@ func (a *Assembler) findQualityChunks(taskDir string) (map[string][]string, erro
 		}
 
 		q := e.Name()
-		chunkPath := filepath.Join(path, q)
-		m[q] = append(m[q], chunkPath)
+		dirPath := filepath.Join(path, q)
+		dirEntries, err := os.ReadDir(dirPath)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, de := range dirEntries {
+			if de.IsDir() {
+				continue
+			}
+
+			m[q] = append(m[q], filepath.Join(dirPath, de.Name()))
+		}
+
 	}
 
 	return m, nil
