@@ -52,43 +52,46 @@ sequenceDiagram
     participant F as FFmpeg
     participant HTTP as HTTP API
     
-    W->>C: GetTask(encoder, hostname, ffmpeg_version)
+    W->>+C: GetTask(encoder, hostname, ffmpeg_version)
+    C--)-W: Response
     alt Задача получена
-        C-->>W: Task
-        W->>P: Prefetch(task)
-        P->>C: Download(source_url)
-        C-->>P: File data
-        P-->>W: Local file path
+        W->>+P: Prefetch(task)
+        P->>+C: Download(source_url)
+        C--)-P: File data
+        P--)-W: Local file path
         W->>B: Add task to backlog
         B->>S: Task available
-        S->>Worker: Assign task (least loaded)
+        S-)Worker: Assign task (least loaded)
         Worker->>Worker: Check capacity (weight)
         alt Воркер доступен
-            Worker->>F: Encode video/audio
+            Worker->>+F: Encode video/audio
             loop Каждые 2 секунды
-                F-->>Worker: Progress
-                Worker->>C: UpdateProgress(delta)
+                F-)Worker: Progress
+                Worker->>+C: UpdateProgress(delta)
+                C--)-Worker: OK
             end
-            F-->>Worker: Encoded files
+            F--)-Worker: Encoded files
             alt Видео задача
-                Worker->>F: Generate poster (if needed)
-                F-->>Worker: Poster file
-                Worker->>HTTP: Upload chunks (parallel)
-                Worker->>HTTP: Upload poster
+                Worker->>+F: Generate poster (if needed)
+                F--)-Worker: Poster file
+                Worker->>+HTTP: Upload chunks (parallel)
+                HTTP--)-Worker: 200 OK
+                Worker->>+HTTP: Upload poster
+                HTTP--)-Worker: 200 OK
             else Аудио задача
-                Worker->>HTTP: Upload audio
+                Worker->>+HTTP: Upload audio
+                HTTP--)-Worker: 200 OK
             end
-            HTTP-->>Worker: 200 OK
-            Worker->>C: FinishTask(success)
+            Worker->>+C: FinishTask(success)
+            C--)-Worker: OK
         else Воркер занят
             S->>S: Wait 15ms, retry
         end
     else Нет задач
-        C-->>W: NO_TASKS
         W->>W: Sleep 3s
     else Ошибка
-        C-->>W: Error
-        W->>C: FinishTask(error)
+        W->>+C: FinishTask(error)
+        C--)-W: OK
     end
 ```
 ## 3. Блок-схема алгоритма работы воркера

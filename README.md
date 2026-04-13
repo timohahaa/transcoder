@@ -6,3 +6,6 @@ I use `systemd-run` to pin `ffmpeg` processes to specific CPU-cores. It is done 
 
 ### Potential optimizations
 - use less `ffprobe` calls :_)
+
+### Sequence diagram
+![diagram](./docs/other/seq-diag.png)
